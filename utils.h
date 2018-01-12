@@ -7,6 +7,7 @@
 #define MAX_VARS 1000
 #define MAX_VAR_NAME 256
 #define MAX_ERROR 1000
+#define MAX_STRVAL 10000
 
 #define BOOL_t -1
 #define CHAR_t -2
@@ -35,12 +36,18 @@ struct variable
   struct data value;
 };
 
+struct FunctionResult
+{
+  struct variable rezVar;
+  bool isVoid;
+};
+
 int nrVars, nextVarId;
 struct variable vars[MAX_VARS];
 bool varDeclared[MAX_VARS];
 
-//extern bool haveError;
-char errorMessage[MAX_ERROR];
+extern bool haveError;
+extern char errorMessage[MAX_ERROR];
 
 void init();
 int SetDataType(const char *);
@@ -60,4 +67,8 @@ void AssignVarValue(char *, struct variable);
 
 void Yell(char *);
 void YellString(char *);
+
+void CopyNumberToString(char *, int);
+void FunctionCallNoParameters(char *);
+struct FunctionResult FunctionCallWithParameters(char *, char *);
 #endif

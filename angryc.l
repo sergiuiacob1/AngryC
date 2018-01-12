@@ -9,10 +9,10 @@ letter [a-zA-Z_]
 varId [_]*{letter}+{number}*
 
 %%
-"int"|"float"|"char"|"string" {yylval.intVal = SetDataType (yytext); return DATA_TYPE;}
+"int"|"float"|"char"|"string" {yylval.intVal = SetDataType (yytext); return VAR_DATA_TYPE;}
 "void" {return FUNCTION_DATA_TYPE;}
-"begin_progr" {return BGIN;}
-"end_progr" {return END;}
+"START_ALREADY!" {return BGIN;}
+"ARE_WE_DONE_YET?!" {return END;}
 "+" {return SUM;}
 "-" {return MINUS;}
 "*" {return TIMES;}
@@ -22,11 +22,13 @@ varId [_]*{letter}+{number}*
 "==" {return EQ;}
 ">=" {return GRE;}
 ">" {return GR;}
-{varId} {if (strcmp (yytext, "yell")==0) {REJECT;} yylval.strVal = (char *)malloc (strlen(yytext) + 1); strcpy (yylval.strVal, yytext); return ID;}
-":=" {return ASSIGN;}
+"=" {return ASSIGN;}
+"for" {return FOR;}
+"if" {return IF;}
+{varId} {if (strcmp (yytext, "yell")==0) {REJECT;} strcpy (yylval.strVal, yytext); return ID;}
 {number} {yylval.intVal = atoi(yytext); return INTEGER;}
 "yell" {return YELL;}
-["][^"]*["] {yylval.strVal = (char *)malloc (strlen(yytext) + 1); strcpy (yylval.strVal, yytext + 1); yylval.strVal [strlen(yylval.strVal) - 1] = 0; return STRING;}
+["][^"]*["] {strcpy (yylval.strVal, yytext + 1); yylval.strVal [strlen(yylval.strVal) - 1] = 0; return STRING;}
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}

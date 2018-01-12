@@ -1,10 +1,51 @@
 #include "./utils.h"
 
+bool haveError;
+char errorMessage[MAX_ERROR];
+
 void init()
 {
     nrVars = 0;
     nextVarId = 0;
+    haveError = false;
+    errorMessage[0] = 0;
     bzero(varDeclared, sizeof(varDeclared));
+}
+
+void CopyNumberToString(char *s, int nr)
+{
+    int nrc, aux, i;
+
+    s[0] = 0;
+    if (nr == 0)
+    {
+        s[0] = '0';
+        s[1] = 0;
+        return;
+    }
+    aux = nr;
+    while (nr)
+    {
+        ++nrc;
+        nr /= 10;
+    }
+    for (i = nrc - 1; i >= 0; --i)
+    {
+        s[i] = aux % 10 + '0';
+        aux /= 10;
+    }
+    s[nrc] = 0;
+}
+
+void FunctionCallNoParameters(char *fId)
+{
+}
+
+struct FunctionResult FunctionCallWithParameters(char *fId, char *params)
+{
+    struct FunctionResult rez;
+
+    return rez;
 }
 
 int SetDataType(const char *text)
@@ -26,14 +67,15 @@ struct variable OperatorFunction(char *a, const char *operator, char *b)
     var1 = GetVariable(a);
     var2 = GetVariable(b);
 
-    /*if (haveError){
+    if (haveError)
+    {
         return rez;
-    }*/
+    }
 
     if (HaveDifferentTypes(var1, var2))
     {
-        //haveError = true;
-        //strcpy(errorMessage, "variables have different data types, you blittering idiot!");
+        haveError = true;
+        strcpy(errorMessage, "variables have different data types, you blittering idiot!");
         return rez;
     }
 
@@ -157,8 +199,8 @@ void AddNewVariable(int type, char *varName)
     for (i = 0; i < nrVars; ++i)
         if (strcmp(vars[i].varName, varName) == 0)
         {
-            //haveError = true;
-            //strcpy (errorMessage, "variable already declared!");
+            haveError = true;
+            strcpy(errorMessage, "DIDN'T YOUR FISH MEMORY KNOW THAT YOU ALREADY DECLARED THIS VARIABLE?!");
             return;
         }
     vars[nrVars].dataType = type;
@@ -174,6 +216,8 @@ struct variable GetVariable(char *varName)
             return vars[i];
 
     //eroare
+    haveError = true;
+    strcpy(errorMessage, "DOES IT LOOK LIKE THIS VARIABLE EXISTS?!");
     return vars[0];
 }
 
@@ -238,7 +282,7 @@ void Yell(char *varName)
 
 void YellString(char *text)
 {
-    if (strcmp(text, "\n") == 0)
+    if (strcmp(text, "\\n") == 0)
     {
         printf("\n");
     }

@@ -49,20 +49,23 @@ extern int yydebug;
     BGIN = 259,
     END = 260,
     DATA_TYPE = 261,
-    FUNCTION_DATA_TYPE = 262,
-    INTEGER = 263,
-    STRING = 264,
-    ASSIGN = 265,
-    SUM = 266,
-    FRACTION = 267,
-    MINUS = 268,
-    TIMES = 269,
-    LW = 270,
-    LWE = 271,
-    EQ = 272,
-    GRE = 273,
-    GR = 274,
-    YELL = 275
+    VAR_DATA_TYPE = 262,
+    FUNCTION_DATA_TYPE = 263,
+    INTEGER = 264,
+    STRING = 265,
+    ASSIGN = 266,
+    SUM = 267,
+    FRACTION = 268,
+    MINUS = 269,
+    TIMES = 270,
+    LW = 271,
+    LWE = 272,
+    EQ = 273,
+    GRE = 274,
+    GR = 275,
+    FOR = 276,
+    IF = 277,
+    YELL = 278
   };
 #endif
 /* Tokens.  */
@@ -70,20 +73,23 @@ extern int yydebug;
 #define BGIN 259
 #define END 260
 #define DATA_TYPE 261
-#define FUNCTION_DATA_TYPE 262
-#define INTEGER 263
-#define STRING 264
-#define ASSIGN 265
-#define SUM 266
-#define FRACTION 267
-#define MINUS 268
-#define TIMES 269
-#define LW 270
-#define LWE 271
-#define EQ 272
-#define GRE 273
-#define GR 274
-#define YELL 275
+#define VAR_DATA_TYPE 262
+#define FUNCTION_DATA_TYPE 263
+#define INTEGER 264
+#define STRING 265
+#define ASSIGN 266
+#define SUM 267
+#define FRACTION 268
+#define MINUS 269
+#define TIMES 270
+#define LW 271
+#define LWE 272
+#define EQ 273
+#define GRE 274
+#define GR 275
+#define FOR 276
+#define IF 277
+#define YELL 278
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -94,10 +100,11 @@ union YYSTYPE
 
     int intVal;
     struct variable var;
+    struct FunctionResult fRez;
     bool boolVal;
-    char *strVal;
+    char strVal[MAX_STRVAL];
 
-#line 101 "y.tab.h" /* yacc.c:1909  */
+#line 108 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

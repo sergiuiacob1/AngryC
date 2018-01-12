@@ -15,23 +15,26 @@
 %union {
     int intVal;
     struct variable var;
+    struct FunctionResult fRez;
     bool boolVal;
-    char *strVal;
+    char strVal[MAX_STRVAL];
 };
 
 %token ID
 %token BGIN END
-%token DATA_TYPE FUNCTION_DATA_TYPE
+%token DATA_TYPE VAR_DATA_TYPE FUNCTION_DATA_TYPE
 %token INTEGER STRING
 %token ASSIGN
 %token SUM FRACTION MINUS TIMES LW LWE EQ GRE GR
+%token FOR IF
 %token YELL
 %start progr
 
 %type<intVal> INTEGER
 %type<var> varop
-%type<intVal> DATA_TYPE
-%type<strVal> ID STRING
+%type<fRez> function_call
+%type<intVal> data_type VAR_DATA_TYPE FUNCTION_DATA_TYPE 
+%type<strVal> ID STRING param_list_function_call param_function_call
 //%type<boolVal> varlogop
 
 %left SUM FRACTION MINUS TIMES LW LWE EQ GRE GR
@@ -40,54 +43,70 @@
 progr: declarations programInstructions
      ;
 
-declarations :  declaration ';'
-	   | declaration ';' declarations
+declarations :  declaration '!'
+	   | declaration '!' declarations
 	   ;
-declaration : DATA_TYPE ID {AddNewVariable($1, $2); if (PrgError()) {return -1;}}
+
+data_type: VAR_DATA_TYPE
+         | FUNCTION_DATA_TYPE
+         ;
+
+declaration : data_type ID {AddNewVariable($1, $2); if (PrgError()) {return -1;}}
            | function_declaration
            ;
 
-function_declaration: FUNCTION_DATA_TYPE ID '(' paramList ')'
-                    | DATA_TYPE ID '(' paramList ')'
-                    | FUNCTION_DATA_TYPE ID "()"
-                    | DATA_TYPE ID "()"
+function_declaration: data_type ID '(' paramList ')'
+                    | data_type ID "()"
 
-paramList : declaration
-            | declaration ',' paramList 
-            ;
+paramList : data_type
+          | data_type ',' paramList 
+          ;
 
 programInstructions : BGIN instructions END  
      ;
      
-instructions :  statement ';' 
-     | instructions statement ';'
+instructions :  statement '!' 
+     | instructions statement '!'
      ;
 
-statement: ID ASSIGN ID
-         | ID ASSIGN INTEGER {CheckAssign ($1, $3); if (PrgError ()) {return -1;} AssignValue ($1, $3);}
-         | ID '(' functionCall ')'
-         | ID ASSIGN varop {AssignVarValue ($1, $3);}
+statement: assignment
+         | function_call
          | YELL '(' ID ')' {Yell ($3); if (PrgError()) {return -1;}}
          | YELL '(' STRING ')' {YellString ($3); if (PrgError()) {return -1;}}
          ;
+
+assignment: ID ASSIGN ID
+         | ID ASSIGN INTEGER {CheckAssign ($1, $3); if (PrgError ()) {return -1;} AssignValue ($1, $3);}
+         | ID ASSIGN varop {AssignVarValue ($1, $3);}
+         ;
+
 
 varop: ID SUM ID { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {return -1;}}
      | ID MINUS ID { $$ = OperatorFunction ($1, "-", $3); if (PrgError()) {return -1;}}
      | ID TIMES ID { $$ = OperatorFunction ($1, "*", $3); if (PrgError()) {return -1;}}
      | ID FRACTION ID { $$ = OperatorFunction ($1,"/", $3); if (PrgError()) {return -1;}}
      ;
+
+function_call: ID '(' param_list_function_call ')' {$$ = FunctionCallWithParameters ($1, $3);}
+             | ID '('')' {}
+             ;
+
+param_list_function_call: param_function_call {strcpy ($$, $1);}
+                        | param_function_call ',' param_list_function_call {strcpy ($$, $1); strcat ($$, " "); strcat ($$, $3);}
+                        ;
+
+param_function_call: ID {strcpy ($$, $1); }
+                   | INTEGER {CopyNumberToString ($$, $1);}
        
 //varlogop: ID LW ID {  $$ = LogicOperatorFunction ($1, "<", $3) if (PrgError()) {return -1;}}
 //		;
-functionCall : INTEGER
-           | functionCall ',' INTEGER
-           ;
+
 %%
 bool PrgError(){
-    /*if (haveErorr){
+    if (haveError){
         yyerror(errorMessage);
         return true;
-    }*/
+    }
     return false;
 }
 
