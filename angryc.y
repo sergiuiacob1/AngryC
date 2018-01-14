@@ -20,9 +20,9 @@
     char strVal[MAX_STRVAL];
 };
 
-%token ID
+%token ID ID_VECTOR
 %token BGIN END
-%token DATA_TYPE VAR_DATA_TYPE FUNCTION_DATA_TYPE
+%token VAR_DATA_TYPE FUNCTION_DATA_TYPE
 %token INTEGER STRING
 %token ASSIGN
 %token SUM FRACTION MINUS TIMES LW LWE EQ GRE GR
@@ -34,7 +34,7 @@
 %type<var> varop
 %type<fRez> function_call
 %type<intVal> data_type VAR_DATA_TYPE FUNCTION_DATA_TYPE 
-%type<strVal> ID STRING param_list_function_call param_function_call
+%type<strVal> ID ID_VECTOR STRING param_list_function_call param_function_call
 //%type<boolVal> varlogop
 
 %left SUM FRACTION MINUS TIMES LW LWE EQ GRE GR
@@ -43,20 +43,23 @@
 progr: declarations programInstructions
      ;
 
-declarations :  declaration '!'
-	   | declaration '!' declarations
-	   ;
+declarations: declaration '!'
+	        | declaration '!' declarations
+	        ;
 
-data_type: VAR_DATA_TYPE
-         | FUNCTION_DATA_TYPE
+data_type: VAR_DATA_TYPE {$$ = $1;}
+         | FUNCTION_DATA_TYPE {$$ = $1;}
          ;
 
-declaration : data_type ID {AddNewVariable($1, $2); if (PrgError()) {return -1;}}
+declaration: data_type ID {AddNewVariable($1, $2); if (PrgError()) {return -1;}}
            | function_declaration
+           | vector_declaration
            ;
 
+vector_declaration: VAR_DATA_TYPE ID_VECTOR '[' INTEGER ']' {DeclareVector ($1, $2, $4); if (PrgError()) {return -1;}}
+
 function_declaration: data_type ID '(' paramList ')'
-                    | data_type ID "()"
+                    | data_type ID '('')'
 
 paramList : data_type
           | data_type ',' paramList 

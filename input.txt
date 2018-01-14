@@ -1,4 +1,5 @@
 int a!
+int x[5]!
 int b!
 int c!
 void Functie (int, int)!

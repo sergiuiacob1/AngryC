@@ -3,13 +3,67 @@
 bool haveError;
 char errorMessage[MAX_ERROR];
 
+void MallocMemoryForVector(struct Vector *);
+
 void init()
 {
-    nrVars = 0;
+    nrVars = nrVectors = 0;
     nextVarId = 0;
     haveError = false;
     errorMessage[0] = 0;
     bzero(varDeclared, sizeof(varDeclared));
+}
+
+void ExtractVectorName(char *where, char *fromWhere)
+{
+    char *aux, copy;
+    aux = strchr(fromWhere, '[');
+    do
+    {
+        --aux;
+    } while (*aux == ' ' || *aux == '\t');
+
+    ++aux;
+    copy = *aux;
+    *aux = 0;
+    strcpy(where, fromWhere);
+    *aux = copy;
+}
+
+void DeclareVector(int vectorType, char *vName, int vSize)
+{
+    int i;
+    for (i = 0; i < nrVectors; ++i)
+    {
+        if (strcmp(vectors[i].vectorName, vName) == 0)
+        {
+            haveError = true;
+            strcpy(errorMessage, "you idiot, you ALREADY HAVE THIS VECTOR");
+            return;
+        }
+    }
+
+    for (i = 0; i < nrVars; ++i)
+    {
+        if (strcmp(vars[i].varName, vName) == 0)
+        {
+            haveError = true;
+            strcpy(errorMessage, "Ugh... YOU ALREADY USED THAT NAME");
+        }
+    }
+
+    strcpy(vectors[nrVectors].vectorName, vName);
+    vectors[nrVectors].dataType = vectorType;
+    vectors[nrVectors].size = vSize;
+    vectors[nrVectors].idVector = nextVarId++;
+
+    MallocMemoryForVector(&vectors[nrVectors]);
+    ++nrVectors;
+}
+
+void MallocMemoryForVector(struct Vector *vector)
+{
+    vector->values = (struct data *)malloc(vector->size * sizeof(struct data));
 }
 
 void CopyNumberToString(char *s, int nr)
@@ -56,6 +110,8 @@ int SetDataType(const char *text)
         return CHAR_t;
     if (strcmp(text, "string") == 0)
         return STRING_t;
+    if (strcmp(text, "void") == 0)
+        return VOID_t;
 
     return INVALID_t;
 }
@@ -197,12 +253,24 @@ void AddNewVariable(int type, char *varName)
     //daca am deja a, eroare
     int i;
     for (i = 0; i < nrVars; ++i)
+    {
         if (strcmp(vars[i].varName, varName) == 0)
         {
             haveError = true;
             strcpy(errorMessage, "DIDN'T YOUR FISH MEMORY KNOW THAT YOU ALREADY DECLARED THIS VARIABLE?!");
             return;
         }
+    }
+    for (i = 0; i < nrVectors; ++i)
+    {
+        if (strcmp(vectors[i].vectorName, varName) == 0)
+        {
+            haveError = true;
+            strcpy(errorMessage, "Ugh... YOU ALREADY USED THAT NAME!");
+            return;
+        }
+    }
+
     vars[nrVars].dataType = type;
     strcpy(vars[nrVars].varName, varName);
     vars[nrVars].idVar = nextVarId++;

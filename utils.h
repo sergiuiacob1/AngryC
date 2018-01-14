@@ -42,8 +42,17 @@ struct FunctionResult
   bool isVoid;
 };
 
-int nrVars, nextVarId;
+struct Vector
+{
+  char vectorName[MAX_VAR_NAME];
+  int dataType, idVector;
+  int size;
+  struct data *values;
+};
+
+int nrVars, nrVectors, nextVarId;
 struct variable vars[MAX_VARS];
+struct Vector vectors[MAX_VARS];
 bool varDeclared[MAX_VARS];
 
 extern bool haveError;
@@ -71,4 +80,7 @@ void YellString(char *);
 void CopyNumberToString(char *, int);
 void FunctionCallNoParameters(char *);
 struct FunctionResult FunctionCallWithParameters(char *, char *);
+
+void DeclareVector(int, char *, int);
+void ExtractVectorName (char *, char *);
 #endif

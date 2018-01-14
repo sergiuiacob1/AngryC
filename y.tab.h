@@ -46,9 +46,9 @@ extern int yydebug;
   enum yytokentype
   {
     ID = 258,
-    BGIN = 259,
-    END = 260,
-    DATA_TYPE = 261,
+    ID_VECTOR = 259,
+    BGIN = 260,
+    END = 261,
     VAR_DATA_TYPE = 262,
     FUNCTION_DATA_TYPE = 263,
     INTEGER = 264,
@@ -70,9 +70,9 @@ extern int yydebug;
 #endif
 /* Tokens.  */
 #define ID 258
-#define BGIN 259
-#define END 260
-#define DATA_TYPE 261
+#define ID_VECTOR 259
+#define BGIN 260
+#define END 261
 #define VAR_DATA_TYPE 262
 #define FUNCTION_DATA_TYPE 263
 #define INTEGER 264
