@@ -3,8 +3,9 @@ int c!
 int x[5]!
 bool mahbool!
 string mystr!
-void Functie (int, int)!
-int f()!
+void Functie (int, int) {}!
+int f2() {}!
+int f3 (void, string, int) {}!
 const int aInt=221!
 const double aDouble=1.5!
 const string aString="a"!
@@ -12,6 +13,7 @@ const string aString="a"!
 START_ALREADY!
 f2()!
 Functie (5, f2())!
+f3(Functie(2, 3), "salz", f2())!
 
 c=2!
 a=2+aInt!

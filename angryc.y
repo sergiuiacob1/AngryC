@@ -64,15 +64,24 @@ data_type: VAR_DATA_TYPE {$$ = $1;}
          ;
 
 declaration: variable_declaration
-           | function_declaration {nrParams = 0;}
+           | function_declaration '{' function_instructions '}' {nrParams = 0;}
+           | function_declaration '{' '}' {nrParams = 0;}
            | vector_declaration
            | const_variable_declaration
            ;
 
+function_instructions: instructions
+                     | declarations
+                     | instructions function_instructions
+                     | declarations function_instructions 
+                     ;
+
 variable_declaration: VAR_DATA_TYPE ID {AddNewVariable($1, $2); if (PrgError()) {return -1;}}
 
-function_declaration: data_type ID '(' param_declaration_list ')' {AddNewFunctionWithParameters ($1, $2); if (PrgError()) {return -1;}}
-                    | data_type ID '('')' {AddNewFunction ($1, $2); if (PrgError()) {return -1;}}
+function_declaration: FUNCTION_DATA_TYPE ID '(' param_declaration_list ')' {AddNewFunctionWithParameters ($1, $2); if (PrgError()) {return -1;}}
+                    | FUNCTION_DATA_TYPE ID '(' ')' {AddNewFunction ($1, $2); if (PrgError()) {return -1;}}
+                    | VAR_DATA_TYPE ID '(' param_declaration_list ')' {AddNewFunctionWithParameters ($1, $2); if (PrgError()) {return -1;}}
+                    | VAR_DATA_TYPE ID '(' ')' {AddNewFunction ($1, $2); if (PrgError()) {return -1;}}
                     ;
 
 vector_declaration: VAR_DATA_TYPE ID_VECTOR '[' INTEGER ']' {DeclareVector ($1, $2, $4); if (PrgError()) {return -1;}}
@@ -162,7 +171,7 @@ varop: varop '+' varop { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {r
      ;
 
 function_call: ID '(' param_list_function_call ')' {FunctionCallWithParameters ($1); nrParams = 0; if (PrgError()) {return -1;} $$ = GetFunction($1).dataType;}
-             | ID '('')' {} {FunctionCallNoParameters ($1); if (PrgError()) {return -1;} $$ = VOID_t;}
+             | ID '('')' {} {FunctionCallNoParameters ($1); if (PrgError()) {return -1;} $$ = GetFunction($1).dataType;}
              ;
 
 param_list_function_call: param_function_call {parameters[nrParams] = $1; ++nrParams;}

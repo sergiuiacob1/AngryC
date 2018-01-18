@@ -50,6 +50,7 @@ struct Function
   int dataType, idFunction;
   char functionName[MAX_VAR_NAME];
   int parameters[MAX_PARAMETERS], nrParams;
+  bool isDefined;
 };
 
 struct Vector

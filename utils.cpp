@@ -32,6 +32,7 @@ void AddNewFunction(int dataType, char *fName)
     functions[nrFunctions].dataType = dataType;
     functions[nrFunctions].idFunction = nextFunctionId++;
     functions[nrFunctions].nrParams = 0;
+    functions[nrFunctions].isDefined = false;
     ++nrFunctions;
 }
 
@@ -44,6 +45,7 @@ void AddNewFunctionWithParameters(int dataType, char *fName)
     functions[nrFunctions].dataType = dataType;
     functions[nrFunctions].idFunction = nextFunctionId++;
     functions[nrFunctions].nrParams = nrParams;
+    functions[nrFunctions].isDefined = false;
     for (int i = 0; i < nrParams; ++i)
         functions[nrFunctions].parameters[i] = parameters[i].dataType;
     ++nrFunctions;
@@ -224,6 +226,12 @@ void FunctionCallNoParameters(char *fId)
     f = GetFunction(fId);
     if (haveError)
         return;
+
+    if (f.nrParams != 0){
+        haveError = true;
+        strcpy (errorMessage, "function needs to receive parameters... GET OUT");
+        return;
+    }
 }
 
 void FunctionCallWithParameters(char *fId)
