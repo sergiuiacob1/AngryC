@@ -81,8 +81,9 @@ extern int yydebug;
     FOR = 291,
     IF = 292,
     ELSE = 293,
-    YELL = 294,
-    PLSPLS = 295
+    WHILE = 294,
+    YELL = 295,
+    PLSPLS = 296
   };
 #endif
 /* Tokens.  */
@@ -122,8 +123,9 @@ extern int yydebug;
 #define FOR 291
 #define IF 292
 #define ELSE 293
-#define YELL 294
-#define PLSPLS 295
+#define WHILE 294
+#define YELL 295
+#define PLSPLS 296
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -139,7 +141,7 @@ union YYSTYPE
     struct variable var;
     Parameter parameter;
 
-#line 143 "y.tab.h" /* yacc.c:1909  */
+#line 145 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

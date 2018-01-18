@@ -37,6 +37,7 @@ varId [_]*{letter}+{number}*{letter}*
 "*"			 {return('*'); }
 "/"			 {return('/'); }
 "%"			 {return('%'); }
+"while" {return WHILE;}
 "for" {return FOR;}
 "if" {return IF;}
 "else" {return ELSE;}

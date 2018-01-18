@@ -11,13 +11,15 @@ bool haveError;
 char errorMessage[MAX_ERROR];
 struct Parameter parameters[MAX_PARAMETERS];
 int nrParams;
+char campuri[MAX_VARS][MAX_VAR_NAME];
+int nrCampuri;
 
 void MallocMemoryForVector(struct Vector *);
 bool AlreadyHaveVariableOrVectorName(char *);
 
 void init()
 {
-    nrVars = nrVectors = nrFunctions = 0;
+    nrVars = nrVectors = nrFunctions = nrCampuri = 0;
     nextVarId = nextFunctionId = 0;
     haveError = false;
     errorMessage[0] = 0;
@@ -26,8 +28,23 @@ void init()
 
 void AddNewFunction(int dataType, char *fName)
 {
+    bool good;
     if (AlreadyHaveVariableOrVectorName(fName))
-        return;
+    {
+        good = false;
+        for (int i = 0; i < nrFunctions; ++i)
+            if (strcmp(functions[i].functionName, fName) == 0)
+            {
+                if (functions[i].nrParams != 0)
+                    good = true;
+                break;
+            }
+
+        if (!good)
+            return;
+        else
+            haveError = false;
+    }
 
     strcpy(functions[nrFunctions].functionName, fName);
     functions[nrFunctions].dataType = dataType;
@@ -39,8 +56,27 @@ void AddNewFunction(int dataType, char *fName)
 
 void AddNewFunctionWithParameters(int dataType, char *fName)
 {
+    bool good;
     if (AlreadyHaveVariableOrVectorName(fName))
-        return;
+    {
+        good = false;
+        for (int i = 0; i < nrFunctions; ++i)
+            if (strcmp(functions[i].functionName, fName) == 0)
+            {
+                if (functions[i].nrParams != nrParams)
+                    good = true;
+                else
+                    for (int j = 0; j < nrParams; ++j)
+                        if (parameters[j].dataType != functions[i].parameters[j])
+                            good = true;
+                break;
+            }
+
+        if (!good)
+            return;
+        else
+            haveError = false;
+    }
 
     strcpy(functions[nrFunctions].functionName, fName);
     functions[nrFunctions].dataType = dataType;
@@ -61,6 +97,8 @@ bool WordIsReserved(char *word)
     if (strcmp(word, "if") == 0)
         return true;
     if (strcmp(word, "for") == 0)
+        return true;
+    if (strcmp(word, "while") == 0)
         return true;
     if (strcmp(word, "else") == 0)
         return true;
@@ -983,12 +1021,35 @@ struct variable GetVariable(char *varName)
     return vars[0];
 }
 
-struct Function GetFunction(char *fName)
+/*struct Function GetFunction(char *fName)
 {
     for (int i = 0; i < nrFunctions; ++i)
     {
         if (strcmp(functions[i].functionName, fName) == 0)
             return functions[i];
+    }
+
+    //eroare
+    haveError = true;
+    strcpy(errorMessage, "DOES IT LOOK LIKE THIS FUNCTION EXISTS?!");
+    return functions[0];
+}*/
+
+struct Function GetFunction(char *fName)
+{
+    bool good;
+    for (int i = 0; i < nrFunctions; ++i)
+    {
+        good = true;
+        if (strcmp(functions[i].functionName, fName) == 0 && nrParams == functions[i].nrParams)
+        {
+            for (int j = 0; j < nrParams; ++j)
+                if (parameters[j].dataType != functions[i].parameters[j])
+                    good = false;
+
+            if (good)
+                return functions[i];
+        }
     }
 
     //eroare

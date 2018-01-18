@@ -5,6 +5,7 @@ bool mahbool!
 string mystr!
 void Functie (int, int) {}!
 int f2() {}!
+int f2(int) {}!
 int f3 (void, string, int) {}!
 const int aInt=221!
 const double aDouble=1.5!
@@ -20,7 +21,7 @@ struct unstruct2222{
 }!
 
 START_ALREADY!
-f2()!
+f2(2.5)!
 Functie (5, f2())!
 f3(Functie(2, 3), "salz", f2())!
 
@@ -36,6 +37,12 @@ for (a=2! a<5! a+=2)
     {
         a=2!
     }!
+
+while (a>=10){
+    a+=5!
+    yell ("woohoo")!
+    yell("\n")!
+}!
 
 a=a*-a!
 ++a!

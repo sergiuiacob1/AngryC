@@ -29,7 +29,7 @@
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token XOR_ASSIGN OR_ASSIGN TYPE_NAME 
-%token FOR IF ELSE
+%token FOR IF ELSE WHILE
 %token YELL
 %start progr
 
@@ -115,7 +115,11 @@ statement: assignment
 
 control_statement: if_statement
                  | for_statement
+                 | while_statement
                  ;
+
+while_statement: WHILE '(' varop ')' '{' instructions '}'
+               | WHILE '(' varop ')' '{' '}'
 
 for_statement: FOR '(' for_assignments '!' varop '!' varop ')'
              | FOR '(' for_assignments '!' varop '!' for_assignments ')' 
@@ -178,7 +182,7 @@ varop: varop '+' varop { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {r
      | STRING {struct variable tempVar; tempVar.value.stringVal = (char*)malloc (strlen($1)+1); strcpy (tempVar.varName, "tempVar"); strcpy (tempVar.value.stringVal, $1); tempVar.dataType = STRING_t; tempVar.isInitialized = true;  $$ = tempVar;}
      ;
 
-function_call: ID '(' param_list_function_call ')' {FunctionCallWithParameters ($1); nrParams = 0; if (PrgError()) {return -1;} $$ = GetFunction($1).dataType;}
+function_call: ID '(' param_list_function_call ')' {int auxDataType; FunctionCallWithParameters ($1); auxDataType = GetFunction($1).dataType; nrParams = 0; if (PrgError()) {return -1;} $$ = auxDataType;}
              | ID '('')' {} {FunctionCallNoParameters ($1); if (PrgError()) {return -1;} $$ = GetFunction($1).dataType;}
              ;
 

@@ -73,6 +73,8 @@ extern bool haveError;
 extern char errorMessage[MAX_ERROR];
 extern struct Parameter parameters[MAX_PARAMETERS];
 extern int nrParams;
+extern char campuri[MAX_VARS][MAX_VAR_NAME];
+extern int nrCampuri;
 
 void init();
 int SetDataType(const char *);
