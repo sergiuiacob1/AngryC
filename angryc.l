@@ -22,12 +22,12 @@ varId [_]*{letter}+{number}*
 "==" {return EQ;}
 ">=" {return GRE;}
 ">" {return GR;}
-"=" {return ASSIGN;}
 "for" {return FOR;}
 "if" {return IF;}
-{varId} {if (strcmp (yytext, "yell")==0) {REJECT;} strcpy (yylval.strVal, yytext); return ID;}
-{varId}[ \t]*\[ {ExtractVectorName(yylval.strVal, yytext); if (strcmp (yylval.strVal, "yell")==0) {REJECT;} yyless (yyleng - 1); return ID_VECTOR; }
+{varId} {if (WordIsReserved (yytext)) {REJECT;} strcpy (yylval.strVal, yytext); return ID;}
+{varId}[ \t]*\[ {ExtractVectorName(yylval.strVal, yytext); if (WordIsReserved(yylval.strVal)) {REJECT;} yyless (yyleng - 1); return ID_VECTOR; }
 {number} {yylval.intVal = atoi(yytext); return INTEGER;}
+"const" {return CONST;}
 "yell" {return YELL;}
 ["][^"]*["] {strcpy (yylval.strVal, yytext + 1); yylval.strVal [strlen(yylval.strVal) - 1] = 0; return STRING;}
 [ \t] ;

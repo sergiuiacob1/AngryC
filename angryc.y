@@ -20,11 +20,10 @@
     char strVal[MAX_STRVAL];
 };
 
-%token ID ID_VECTOR
+%token ID ID_VECTOR CONST
 %token BGIN END
 %token VAR_DATA_TYPE FUNCTION_DATA_TYPE
 %token INTEGER STRING
-%token ASSIGN
 %token SUM FRACTION MINUS TIMES LW LWE EQ GRE GR
 %token FOR IF
 %token YELL
@@ -51,15 +50,20 @@ data_type: VAR_DATA_TYPE {$$ = $1;}
          | FUNCTION_DATA_TYPE {$$ = $1;}
          ;
 
-declaration: data_type ID {AddNewVariable($1, $2); if (PrgError()) {return -1;}}
+declaration: variable_declaration
            | function_declaration
            | vector_declaration
+           | const_variable_declaration
            ;
 
-vector_declaration: VAR_DATA_TYPE ID_VECTOR '[' INTEGER ']' {DeclareVector ($1, $2, $4); if (PrgError()) {return -1;}}
+variable_declaration: VAR_DATA_TYPE ID {AddNewVariable($1, $2); if (PrgError()) {return -1;}}
 
 function_declaration: data_type ID '(' paramList ')'
                     | data_type ID '('')'
+
+vector_declaration: VAR_DATA_TYPE ID_VECTOR '[' INTEGER ']' {DeclareVector ($1, $2, $4); if (PrgError()) {return -1;}}
+
+const_variable_declaration: CONST VAR_DATA_TYPE ID '=' INTEGER {AddNewConstant($2, $3, 5); if (PrgError()) {return -1;}}
 
 paramList : data_type
           | data_type ',' paramList 
@@ -78,9 +82,9 @@ statement: assignment
          | YELL '(' STRING ')' {YellString ($3); if (PrgError()) {return -1;}}
          ;
 
-assignment: ID ASSIGN ID
-         | ID ASSIGN INTEGER {CheckAssign ($1, $3); if (PrgError ()) {return -1;} AssignValue ($1, $3);}
-         | ID ASSIGN varop {AssignVarValue ($1, $3);}
+assignment: ID '=' ID
+         | ID '=' INTEGER {CheckAssign ($1, $3); if (PrgError ()) {return -1;} AssignValue ($1, $3);}
+         | ID '=' varop {AssignVarValue ($1, $3);}
          ;
 
 

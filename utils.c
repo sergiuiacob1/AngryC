@@ -4,6 +4,7 @@ bool haveError;
 char errorMessage[MAX_ERROR];
 
 void MallocMemoryForVector(struct Vector *);
+bool AlreadyHaveVariableOrVectorName(char *);
 
 void init()
 {
@@ -12,6 +13,55 @@ void init()
     haveError = false;
     errorMessage[0] = 0;
     bzero(varDeclared, sizeof(varDeclared));
+}
+
+bool WordIsReserved(char *word)
+{
+    if (strcmp(word, "yell") == 0)
+        return true;
+    if (strcmp(word, "const") == 0)
+        return true;
+    return false;
+}
+
+bool AlreadyHaveVariableOrVectorName(char *name)
+{
+    int i;
+    for (i = 0; i < nrVectors; ++i)
+    {
+        if (strcmp(vectors[i].vectorName, name) == 0)
+        {
+            haveError = true;
+            strcpy(errorMessage, "you idiot, you ALREADY HAVE THIS VECTOR");
+            return true;
+        }
+    }
+
+    for (i = 0; i < nrVars; ++i)
+    {
+        if (strcmp(vars[i].varName, name) == 0)
+        {
+            haveError = true;
+            strcpy(errorMessage, "Ugh... YOU ALREADY USED THAT NAME");
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void AddNewConstant(int dataType, char *varName, int value)
+{
+    int i;
+    if (AlreadyHaveVariableOrVectorName(varName))
+        return;
+
+    vars[nrVars].dataType = dataType;
+    strcpy(vars[nrVars].varName, varName);
+    AssignValue(varName, value);
+    vars[nrVars].idVar = ++nextVarId;
+    vars[nrVars].isConstant = true;
+    return;
 }
 
 void ExtractVectorName(char *where, char *fromWhere)
@@ -33,24 +83,8 @@ void ExtractVectorName(char *where, char *fromWhere)
 void DeclareVector(int vectorType, char *vName, int vSize)
 {
     int i;
-    for (i = 0; i < nrVectors; ++i)
-    {
-        if (strcmp(vectors[i].vectorName, vName) == 0)
-        {
-            haveError = true;
-            strcpy(errorMessage, "you idiot, you ALREADY HAVE THIS VECTOR");
-            return;
-        }
-    }
-
-    for (i = 0; i < nrVars; ++i)
-    {
-        if (strcmp(vars[i].varName, vName) == 0)
-        {
-            haveError = true;
-            strcpy(errorMessage, "Ugh... YOU ALREADY USED THAT NAME");
-        }
-    }
+    if (AlreadyHaveVariableOrVectorName(vName))
+        return;
 
     strcpy(vectors[nrVectors].vectorName, vName);
     vectors[nrVectors].dataType = vectorType;
@@ -252,36 +286,23 @@ void AddNewVariable(int type, char *varName)
 {
     //daca am deja a, eroare
     int i;
-    for (i = 0; i < nrVars; ++i)
-    {
-        if (strcmp(vars[i].varName, varName) == 0)
-        {
-            haveError = true;
-            strcpy(errorMessage, "DIDN'T YOUR FISH MEMORY KNOW THAT YOU ALREADY DECLARED THIS VARIABLE?!");
-            return;
-        }
-    }
-    for (i = 0; i < nrVectors; ++i)
-    {
-        if (strcmp(vectors[i].vectorName, varName) == 0)
-        {
-            haveError = true;
-            strcpy(errorMessage, "Ugh... YOU ALREADY USED THAT NAME!");
-            return;
-        }
-    }
+    if (AlreadyHaveVariableOrVectorName(varName))
+        return;
 
     vars[nrVars].dataType = type;
     strcpy(vars[nrVars].varName, varName);
     vars[nrVars].idVar = nextVarId++;
+    vars[nrVars].isConstant = false;
     ++nrVars;
 }
 
 struct variable GetVariable(char *varName)
 {
     for (int i = 0; i < nrVars; ++i)
+    {
         if (strcmp(vars[i].varName, varName) == 0)
             return vars[i];
+    }
 
     //eroare
     haveError = true;

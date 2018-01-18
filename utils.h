@@ -33,6 +33,7 @@ struct variable
 {
   int dataType, idVar;
   char varName[MAX_VAR_NAME];
+  bool isConstant;
   struct data value;
 };
 
@@ -82,5 +83,9 @@ void FunctionCallNoParameters(char *);
 struct FunctionResult FunctionCallWithParameters(char *, char *);
 
 void DeclareVector(int, char *, int);
-void ExtractVectorName (char *, char *);
+void ExtractVectorName(char *, char *);
+
+void AddNewConstant(int, char *, int);
+
+bool WordIsReserved (char *);
 #endif

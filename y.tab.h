@@ -47,13 +47,13 @@ extern int yydebug;
   {
     ID = 258,
     ID_VECTOR = 259,
-    BGIN = 260,
-    END = 261,
-    VAR_DATA_TYPE = 262,
-    FUNCTION_DATA_TYPE = 263,
-    INTEGER = 264,
-    STRING = 265,
-    ASSIGN = 266,
+    CONST = 260,
+    BGIN = 261,
+    END = 262,
+    VAR_DATA_TYPE = 263,
+    FUNCTION_DATA_TYPE = 264,
+    INTEGER = 265,
+    STRING = 266,
     SUM = 267,
     FRACTION = 268,
     MINUS = 269,
@@ -71,13 +71,13 @@ extern int yydebug;
 /* Tokens.  */
 #define ID 258
 #define ID_VECTOR 259
-#define BGIN 260
-#define END 261
-#define VAR_DATA_TYPE 262
-#define FUNCTION_DATA_TYPE 263
-#define INTEGER 264
-#define STRING 265
-#define ASSIGN 266
+#define CONST 260
+#define BGIN 261
+#define END 262
+#define VAR_DATA_TYPE 263
+#define FUNCTION_DATA_TYPE 264
+#define INTEGER 265
+#define STRING 266
 #define SUM 267
 #define FRACTION 268
 #define MINUS 269

@@ -4,6 +4,7 @@ int b!
 int c!
 void Functie (int, int)!
 char c1!
+const int ax=221!
 
 START_ALREADY!
 a=2!
