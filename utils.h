@@ -51,11 +51,6 @@ struct Vector
   struct data *values;
 };
 
-int nrVars, nrVectors, nextVarId;
-struct variable vars[MAX_VARS];
-struct Vector vectors[MAX_VARS];
-bool varDeclared[MAX_VARS];
-
 extern bool haveError;
 extern char errorMessage[MAX_ERROR];
 
@@ -73,6 +68,8 @@ struct variable GetVariable(char *);
 
 void CheckAssign(char *, int);
 void AssignValue(char *, int);
+void AssignValue(char *, double);
+void AssignValue(char *, char *);
 void AssignVarValue(char *, struct variable);
 
 void Yell(char *);
@@ -86,6 +83,8 @@ void DeclareVector(int, char *, int);
 void ExtractVectorName(char *, char *);
 
 void AddNewConstant(int, char *, int);
+void AddNewConstant(int, char *, double);
+void AddNewConstant(int, char *, char *);
 
-bool WordIsReserved (char *);
+bool WordIsReserved(char *);
 #endif

@@ -53,19 +53,20 @@ extern int yydebug;
     VAR_DATA_TYPE = 263,
     FUNCTION_DATA_TYPE = 264,
     INTEGER = 265,
-    STRING = 266,
-    SUM = 267,
-    FRACTION = 268,
-    MINUS = 269,
-    TIMES = 270,
-    LW = 271,
-    LWE = 272,
-    EQ = 273,
-    GRE = 274,
-    GR = 275,
-    FOR = 276,
-    IF = 277,
-    YELL = 278
+    DOUBLE = 266,
+    STRING = 267,
+    SUM = 268,
+    FRACTION = 269,
+    MINUS = 270,
+    TIMES = 271,
+    LW = 272,
+    LWE = 273,
+    EQ = 274,
+    GRE = 275,
+    GR = 276,
+    FOR = 277,
+    IF = 278,
+    YELL = 279
   };
 #endif
 /* Tokens.  */
@@ -77,19 +78,20 @@ extern int yydebug;
 #define VAR_DATA_TYPE 263
 #define FUNCTION_DATA_TYPE 264
 #define INTEGER 265
-#define STRING 266
-#define SUM 267
-#define FRACTION 268
-#define MINUS 269
-#define TIMES 270
-#define LW 271
-#define LWE 272
-#define EQ 273
-#define GRE 274
-#define GR 275
-#define FOR 276
-#define IF 277
-#define YELL 278
+#define DOUBLE 266
+#define STRING 267
+#define SUM 268
+#define FRACTION 269
+#define MINUS 270
+#define TIMES 271
+#define LW 272
+#define LWE 273
+#define EQ 274
+#define GRE 275
+#define GR 276
+#define FOR 277
+#define IF 278
+#define YELL 279
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -99,12 +101,13 @@ union YYSTYPE
 #line 15 "angryc.y" /* yacc.c:1909  */
 
     int intVal;
-    struct variable var;
-    struct FunctionResult fRez;
+    double doubleVal;
     bool boolVal;
     char strVal[MAX_STRVAL];
+    struct variable var;
+    struct FunctionResult fRez;
 
-#line 108 "y.tab.h" /* yacc.c:1909  */
+#line 111 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

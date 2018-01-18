@@ -1,0 +1,628 @@
+Terminals unused in grammar
+
+   ID_VECTOR
+   CONST
+   LW
+   LWE
+   EQ
+   GRE
+   GR
+   FOR
+   IF
+
+
+State 1 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: progr $end
+
+    1 progr: declarations programInstructions
+
+    2 declarations: declaration '!'
+    3             | declaration '!' declarations
+
+    4 data_type: VAR_DATA_TYPE
+    5          | FUNCTION_DATA_TYPE
+
+    6 declaration: VAR_DATA_TYPE ID
+    7            | function_declaration
+
+    8 function_declaration: data_type ID '(' paramList ')'
+    9                     | data_type ID '(' ')'
+
+   10 paramList: data_type
+   11          | data_type ',' paramList
+
+   12 programInstructions: BGIN instructions END
+
+   13 instructions: statement '!'
+   14             | instructions statement '!'
+
+   15 statement: assignment
+   16          | function_call
+   17          | YELL '(' ID ')'
+   18          | YELL '(' STRING ')'
+
+   19 assignment: ID ASSIGN ID
+   20           | ID ASSIGN INTEGER
+   21           | ID ASSIGN varop
+
+   22 varop: ID SUM ID
+   23      | ID MINUS ID
+   24      | ID TIMES ID
+   25      | ID FRACTION ID
+
+   26 function_call: ID '(' param_list_function_call ')'
+   27              | ID '(' ')'
+
+   28 param_list_function_call: param_function_call
+   29                         | param_function_call ',' param_list_function_call
+
+   30 param_function_call: ID
+   31                    | INTEGER
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'!' (33) 2 3 13 14
+'(' (40) 8 9 17 18 26 27
+')' (41) 8 9 17 18 26 27
+',' (44) 11 29
+error (256)
+ID (258) 6 8 9 17 19 20 21 22 23 24 25 26 27 30
+ID_VECTOR (259)
+CONST (260)
+BGIN (261) 12
+END (262) 12
+VAR_DATA_TYPE (263) 4 6
+FUNCTION_DATA_TYPE (264) 5
+INTEGER (265) 20 31
+STRING (266) 18
+ASSIGN (267) 19 20 21
+SUM (268) 22
+FRACTION (269) 25
+MINUS (270) 23
+TIMES (271) 24
+LW (272)
+LWE (273)
+EQ (274)
+GRE (275)
+GR (276)
+FOR (277)
+IF (278)
+YELL (279) 17 18
+
+
+Nonterminals, with rules where they appear
+
+$accept (29)
+    on left: 0
+progr (30)
+    on left: 1, on right: 0
+declarations (31)
+    on left: 2 3, on right: 1 3
+data_type (32)
+    on left: 4 5, on right: 8 9 10 11
+declaration (33)
+    on left: 6 7, on right: 2 3
+function_declaration (34)
+    on left: 8 9, on right: 7
+paramList (35)
+    on left: 10 11, on right: 8 11
+programInstructions (36)
+    on left: 12, on right: 1
+instructions (37)
+    on left: 13 14, on right: 12 14
+statement (38)
+    on left: 15 16 17 18, on right: 13 14
+assignment (39)
+    on left: 19 20 21, on right: 15
+varop (40)
+    on left: 22 23 24 25, on right: 21
+function_call (41)
+    on left: 26 27, on right: 16
+param_list_function_call (42)
+    on left: 28 29, on right: 26 29
+param_function_call (43)
+    on left: 30 31, on right: 28 29
+
+
+State 0
+
+    0 $accept: . progr $end
+
+    VAR_DATA_TYPE       shift, and go to state 1
+    FUNCTION_DATA_TYPE  shift, and go to state 2
+
+    progr                 go to state 3
+    declarations          go to state 4
+    data_type             go to state 5
+    declaration           go to state 6
+    function_declaration  go to state 7
+
+
+State 1
+
+    4 data_type: VAR_DATA_TYPE .
+    6 declaration: VAR_DATA_TYPE . ID
+
+    ID  shift, and go to state 8
+
+    ID  [reduce using rule 4 (data_type)]
+
+
+State 2
+
+    5 data_type: FUNCTION_DATA_TYPE .
+
+    $default  reduce using rule 5 (data_type)
+
+
+State 3
+
+    0 $accept: progr . $end
+
+    $end  shift, and go to state 9
+
+
+State 4
+
+    1 progr: declarations . programInstructions
+
+    BGIN  shift, and go to state 10
+
+    programInstructions  go to state 11
+
+
+State 5
+
+    8 function_declaration: data_type . ID '(' paramList ')'
+    9                     | data_type . ID '(' ')'
+
+    ID  shift, and go to state 12
+
+
+State 6
+
+    2 declarations: declaration . '!'
+    3             | declaration . '!' declarations
+
+    '!'  shift, and go to state 13
+
+
+State 7
+
+    7 declaration: function_declaration .
+
+    $default  reduce using rule 7 (declaration)
+
+
+State 8
+
+    6 declaration: VAR_DATA_TYPE ID .
+
+    $default  reduce using rule 6 (declaration)
+
+
+State 9
+
+    0 $accept: progr $end .
+
+    $default  accept
+
+
+State 10
+
+   12 programInstructions: BGIN . instructions END
+
+    ID    shift, and go to state 14
+    YELL  shift, and go to state 15
+
+    instructions   go to state 16
+    statement      go to state 17
+    assignment     go to state 18
+    function_call  go to state 19
+
+
+State 11
+
+    1 progr: declarations programInstructions .
+
+    $default  reduce using rule 1 (progr)
+
+
+State 12
+
+    8 function_declaration: data_type ID . '(' paramList ')'
+    9                     | data_type ID . '(' ')'
+
+    '('  shift, and go to state 20
+
+
+State 13
+
+    2 declarations: declaration '!' .
+    3             | declaration '!' . declarations
+
+    VAR_DATA_TYPE       shift, and go to state 1
+    FUNCTION_DATA_TYPE  shift, and go to state 2
+
+    $default  reduce using rule 2 (declarations)
+
+    declarations          go to state 21
+    data_type             go to state 5
+    declaration           go to state 6
+    function_declaration  go to state 7
+
+
+State 14
+
+   19 assignment: ID . ASSIGN ID
+   20           | ID . ASSIGN INTEGER
+   21           | ID . ASSIGN varop
+   26 function_call: ID . '(' param_list_function_call ')'
+   27              | ID . '(' ')'
+
+    ASSIGN  shift, and go to state 22
+    '('     shift, and go to state 23
+
+
+State 15
+
+   17 statement: YELL . '(' ID ')'
+   18          | YELL . '(' STRING ')'
+
+    '('  shift, and go to state 24
+
+
+State 16
+
+   12 programInstructions: BGIN instructions . END
+   14 instructions: instructions . statement '!'
+
+    ID    shift, and go to state 14
+    END   shift, and go to state 25
+    YELL  shift, and go to state 15
+
+    statement      go to state 26
+    assignment     go to state 18
+    function_call  go to state 19
+
+
+State 17
+
+   13 instructions: statement . '!'
+
+    '!'  shift, and go to state 27
+
+
+State 18
+
+   15 statement: assignment .
+
+    $default  reduce using rule 15 (statement)
+
+
+State 19
+
+   16 statement: function_call .
+
+    $default  reduce using rule 16 (statement)
+
+
+State 20
+
+    8 function_declaration: data_type ID '(' . paramList ')'
+    9                     | data_type ID '(' . ')'
+
+    VAR_DATA_TYPE       shift, and go to state 28
+    FUNCTION_DATA_TYPE  shift, and go to state 2
+    ')'                 shift, and go to state 29
+
+    data_type  go to state 30
+    paramList  go to state 31
+
+
+State 21
+
+    3 declarations: declaration '!' declarations .
+
+    $default  reduce using rule 3 (declarations)
+
+
+State 22
+
+   19 assignment: ID ASSIGN . ID
+   20           | ID ASSIGN . INTEGER
+   21           | ID ASSIGN . varop
+
+    ID       shift, and go to state 32
+    INTEGER  shift, and go to state 33
+
+    varop  go to state 34
+
+
+State 23
+
+   26 function_call: ID '(' . param_list_function_call ')'
+   27              | ID '(' . ')'
+
+    ID       shift, and go to state 35
+    INTEGER  shift, and go to state 36
+    ')'      shift, and go to state 37
+
+    param_list_function_call  go to state 38
+    param_function_call       go to state 39
+
+
+State 24
+
+   17 statement: YELL '(' . ID ')'
+   18          | YELL '(' . STRING ')'
+
+    ID      shift, and go to state 40
+    STRING  shift, and go to state 41
+
+
+State 25
+
+   12 programInstructions: BGIN instructions END .
+
+    $default  reduce using rule 12 (programInstructions)
+
+
+State 26
+
+   14 instructions: instructions statement . '!'
+
+    '!'  shift, and go to state 42
+
+
+State 27
+
+   13 instructions: statement '!' .
+
+    $default  reduce using rule 13 (instructions)
+
+
+State 28
+
+    4 data_type: VAR_DATA_TYPE .
+
+    $default  reduce using rule 4 (data_type)
+
+
+State 29
+
+    9 function_declaration: data_type ID '(' ')' .
+
+    $default  reduce using rule 9 (function_declaration)
+
+
+State 30
+
+   10 paramList: data_type .
+   11          | data_type . ',' paramList
+
+    ','  shift, and go to state 43
+
+    $default  reduce using rule 10 (paramList)
+
+
+State 31
+
+    8 function_declaration: data_type ID '(' paramList . ')'
+
+    ')'  shift, and go to state 44
+
+
+State 32
+
+   19 assignment: ID ASSIGN ID .
+   22 varop: ID . SUM ID
+   23      | ID . MINUS ID
+   24      | ID . TIMES ID
+   25      | ID . FRACTION ID
+
+    SUM       shift, and go to state 45
+    FRACTION  shift, and go to state 46
+    MINUS     shift, and go to state 47
+    TIMES     shift, and go to state 48
+
+    $default  reduce using rule 19 (assignment)
+
+
+State 33
+
+   20 assignment: ID ASSIGN INTEGER .
+
+    $default  reduce using rule 20 (assignment)
+
+
+State 34
+
+   21 assignment: ID ASSIGN varop .
+
+    $default  reduce using rule 21 (assignment)
+
+
+State 35
+
+   30 param_function_call: ID .
+
+    $default  reduce using rule 30 (param_function_call)
+
+
+State 36
+
+   31 param_function_call: INTEGER .
+
+    $default  reduce using rule 31 (param_function_call)
+
+
+State 37
+
+   27 function_call: ID '(' ')' .
+
+    $default  reduce using rule 27 (function_call)
+
+
+State 38
+
+   26 function_call: ID '(' param_list_function_call . ')'
+
+    ')'  shift, and go to state 49
+
+
+State 39
+
+   28 param_list_function_call: param_function_call .
+   29                         | param_function_call . ',' param_list_function_call
+
+    ','  shift, and go to state 50
+
+    $default  reduce using rule 28 (param_list_function_call)
+
+
+State 40
+
+   17 statement: YELL '(' ID . ')'
+
+    ')'  shift, and go to state 51
+
+
+State 41
+
+   18 statement: YELL '(' STRING . ')'
+
+    ')'  shift, and go to state 52
+
+
+State 42
+
+   14 instructions: instructions statement '!' .
+
+    $default  reduce using rule 14 (instructions)
+
+
+State 43
+
+   11 paramList: data_type ',' . paramList
+
+    VAR_DATA_TYPE       shift, and go to state 28
+    FUNCTION_DATA_TYPE  shift, and go to state 2
+
+    data_type  go to state 30
+    paramList  go to state 53
+
+
+State 44
+
+    8 function_declaration: data_type ID '(' paramList ')' .
+
+    $default  reduce using rule 8 (function_declaration)
+
+
+State 45
+
+   22 varop: ID SUM . ID
+
+    ID  shift, and go to state 54
+
+
+State 46
+
+   25 varop: ID FRACTION . ID
+
+    ID  shift, and go to state 55
+
+
+State 47
+
+   23 varop: ID MINUS . ID
+
+    ID  shift, and go to state 56
+
+
+State 48
+
+   24 varop: ID TIMES . ID
+
+    ID  shift, and go to state 57
+
+
+State 49
+
+   26 function_call: ID '(' param_list_function_call ')' .
+
+    $default  reduce using rule 26 (function_call)
+
+
+State 50
+
+   29 param_list_function_call: param_function_call ',' . param_list_function_call
+
+    ID       shift, and go to state 35
+    INTEGER  shift, and go to state 36
+
+    param_list_function_call  go to state 58
+    param_function_call       go to state 39
+
+
+State 51
+
+   17 statement: YELL '(' ID ')' .
+
+    $default  reduce using rule 17 (statement)
+
+
+State 52
+
+   18 statement: YELL '(' STRING ')' .
+
+    $default  reduce using rule 18 (statement)
+
+
+State 53
+
+   11 paramList: data_type ',' paramList .
+
+    $default  reduce using rule 11 (paramList)
+
+
+State 54
+
+   22 varop: ID SUM ID .
+
+    $default  reduce using rule 22 (varop)
+
+
+State 55
+
+   25 varop: ID FRACTION ID .
+
+    $default  reduce using rule 25 (varop)
+
+
+State 56
+
+   23 varop: ID MINUS ID .
+
+    $default  reduce using rule 23 (varop)
+
+
+State 57
+
+   24 varop: ID TIMES ID .
+
+    $default  reduce using rule 24 (varop)
+
+
+State 58
+
+   29 param_list_function_call: param_function_call ',' param_list_function_call .
+
+    $default  reduce using rule 29 (param_list_function_call)

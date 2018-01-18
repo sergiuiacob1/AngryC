@@ -14,16 +14,17 @@
 
 %union {
     int intVal;
-    struct variable var;
-    struct FunctionResult fRez;
+    double doubleVal;
     bool boolVal;
     char strVal[MAX_STRVAL];
+    struct variable var;
+    struct FunctionResult fRez;
 };
 
 %token ID ID_VECTOR CONST
 %token BGIN END
 %token VAR_DATA_TYPE FUNCTION_DATA_TYPE
-%token INTEGER STRING
+%token INTEGER DOUBLE STRING
 %token SUM FRACTION MINUS TIMES LW LWE EQ GRE GR
 %token FOR IF
 %token YELL
@@ -34,6 +35,7 @@
 %type<fRez> function_call
 %type<intVal> data_type VAR_DATA_TYPE FUNCTION_DATA_TYPE 
 %type<strVal> ID ID_VECTOR STRING param_list_function_call param_function_call
+%type<doubleVal> DOUBLE
 //%type<boolVal> varlogop
 
 %left SUM FRACTION MINUS TIMES LW LWE EQ GRE GR
@@ -63,7 +65,9 @@ function_declaration: data_type ID '(' paramList ')'
 
 vector_declaration: VAR_DATA_TYPE ID_VECTOR '[' INTEGER ']' {DeclareVector ($1, $2, $4); if (PrgError()) {return -1;}}
 
-const_variable_declaration: CONST VAR_DATA_TYPE ID '=' INTEGER {AddNewConstant($2, $3, 5); if (PrgError()) {return -1;}}
+const_variable_declaration: CONST VAR_DATA_TYPE ID '=' INTEGER {AddNewConstant($2, $3, $5); if (PrgError()) {return -1;}}
+                          | CONST VAR_DATA_TYPE ID '=' DOUBLE {AddNewConstant($2, $3, $5); if (PrgError()) {return -1;}}
+                          | CONST VAR_DATA_TYPE ID '=' STRING {AddNewConstant($2, $3, $5); if (PrgError()) {return -1;}}
 
 paramList : data_type
           | data_type ',' paramList 
@@ -84,6 +88,7 @@ statement: assignment
 
 assignment: ID '=' ID
          | ID '=' INTEGER {CheckAssign ($1, $3); if (PrgError ()) {return -1;} AssignValue ($1, $3);}
+         | ID '=' DOUBLE {CheckAssign ($1, $3); if (PrgError()) {return -1;} AssignValue ($1, $3);}
          | ID '=' varop {AssignVarValue ($1, $3);}
          ;
 

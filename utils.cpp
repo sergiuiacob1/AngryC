@@ -1,5 +1,10 @@
 #include "./utils.h"
 
+int nrVars, nrVectors, nextVarId;
+struct variable vars[MAX_VARS];
+struct Vector vectors[MAX_VARS];
+bool varDeclared[MAX_VARS];
+
 bool haveError;
 char errorMessage[MAX_ERROR];
 
@@ -42,6 +47,8 @@ bool AlreadyHaveVariableOrVectorName(char *name)
         if (strcmp(vars[i].varName, name) == 0)
         {
             haveError = true;
+            int nrVars, nrVectors, nextVarId;
+
             strcpy(errorMessage, "Ugh... YOU ALREADY USED THAT NAME");
             return true;
         }
@@ -58,9 +65,46 @@ void AddNewConstant(int dataType, char *varName, int value)
 
     vars[nrVars].dataType = dataType;
     strcpy(vars[nrVars].varName, varName);
-    AssignValue(varName, value);
     vars[nrVars].idVar = ++nextVarId;
     vars[nrVars].isConstant = true;
+    ++nrVars;
+    AssignValue(varName, value);
+    if (haveError)
+        --nrVars;
+    return;
+}
+
+void AddNewConstant(int dataType, char *varName, double value)
+{
+    int i;
+    if (AlreadyHaveVariableOrVectorName(varName))
+        return;
+
+    vars[nrVars].dataType = dataType;
+    strcpy(vars[nrVars].varName, varName);
+    vars[nrVars].idVar = ++nextVarId;
+    vars[nrVars].isConstant = true;
+    ++nrVars;
+    AssignValue(varName, value);
+    if (haveError)
+        --nrVars;
+    return;
+}
+
+void AddNewConstant(int dataType, char *varName, char *strVal)
+{
+    int i;
+    if (AlreadyHaveVariableOrVectorName(varName))
+        return;
+
+    vars[nrVars].dataType = dataType;
+    strcpy(vars[nrVars].varName, varName);
+    vars[nrVars].idVar = ++nextVarId;
+    vars[nrVars].isConstant = true;
+    ++nrVars;
+    AssignValue(varName, strVal);
+    if (haveError)
+        --nrVars;
     return;
 }
 
@@ -140,6 +184,8 @@ int SetDataType(const char *text)
 {
     if (strcmp(text, "int") == 0)
         return INT_t;
+    if (strcmp(text, "double") == 0)
+        return DOUBLE_t;
     if (strcmp(text, "char") == 0)
         return CHAR_t;
     if (strcmp(text, "string") == 0)
@@ -150,7 +196,7 @@ int SetDataType(const char *text)
     return INVALID_t;
 }
 
-struct variable OperatorFunction(char *a, const char *operator, char *b)
+struct variable OperatorFunction(char *a, const char *op, char *b)
 {
     struct variable rez, var1, var2;
 
@@ -162,20 +208,20 @@ struct variable OperatorFunction(char *a, const char *operator, char *b)
         return rez;
     }
 
-    if (HaveDifferentTypes(var1, var2))
+    /*if (HaveDifferentTypes(var1, var2))
     {
         haveError = true;
         strcpy(errorMessage, "variables have different data types, you blittering idiot!");
         return rez;
-    }
+    }*/
 
-    if (strcmp(operator, "+") == 0)
+    if (strcmp(op, "+") == 0)
         rez = SumFunction(var1, var2);
-    if (strcmp(operator, "-") == 0)
+    if (strcmp(op, "-") == 0)
         rez = MinusFunction(var1, var2);
-    if (strcmp(operator, "*") == 0)
+    if (strcmp(op, "*") == 0)
         rez = TimesFunction(var1, var2);
-    if (strcmp(operator, "/") == 0)
+    if (strcmp(op, "/") == 0)
         rez = SumFunction(var1, var2);
     return rez;
 }
@@ -284,7 +330,6 @@ struct variable FractionFunction(struct variable a, struct variable b)
 
 void AddNewVariable(int type, char *varName)
 {
-    //daca am deja a, eroare
     int i;
     if (AlreadyHaveVariableOrVectorName(varName))
         return;
@@ -317,15 +362,85 @@ void CheckAssign(char varName[], int val)
 void AssignValue(char *varName, int val)
 {
     int i;
+
     for (i = 0; i < nrVars; ++i)
         if (strcmp(varName, vars[i].varName) == 0)
         {
-            vars[i].value.intVal = val;
+            if (vars[i].dataType == VOID_t || vars[i].dataType == STRING_t)
+            {
+                haveError = true;
+                strcpy(errorMessage, "dude, wrong assignment... ugh... does yo momma want you?");
+                return;
+            }
+            switch (vars[i].dataType)
+            {
+            case DOUBLE_t:
+                vars[i].value.doubleVal = val;
+                break;
+            case INT_t:
+                vars[i].value.intVal = val;
+                break;
+            }
             return;
         }
 
-    //eroare
     return;
+}
+
+void AssignValue(char *varName, double val)
+{
+    int i;
+    for (i = 0; i < nrVars; ++i)
+        if (strcmp(varName, vars[i].varName) == 0)
+        {
+            if (vars[i].dataType != DOUBLE_t)
+            {
+                haveError = true;
+                strcpy(errorMessage, "dude, wrong assignment... ugh... does yo momma want you?");
+                return;
+            }
+            vars[i].value.doubleVal = val;
+            return;
+        }
+
+    return;
+}
+
+void AssignValue(char *varName, char *strVal)
+{
+    int i;
+    for (i = 0; i < nrVars; ++i)
+        if (strcmp(varName, vars[i].varName) == 0)
+        {
+            if (vars[i].dataType != CHAR_t && vars[i].dataType != STRING_t)
+            {
+                haveError = true;
+                strcpy(errorMessage, "dude, wrong assignment... ugh...");
+                return;
+            }
+
+            switch (vars[i].dataType)
+            {
+            case CHAR_t:
+                if (strlen(strVal) > 1)
+                {
+                    haveError = true;
+                    strcpy(errorMessage, "can't assign string to char!");
+                    return;
+                }
+                vars[i].value.charVal = strVal[0];
+                break;
+
+            case STRING_t:
+                if (vars[i].value.stringVal != NULL)
+                    delete vars[i].value.stringVal;
+
+                vars[i].value.stringVal = new char[strlen(strVal) + 1];
+                strcpy(vars[i].value.stringVal, strVal);
+                break;
+            }
+            return;
+        }
 }
 
 void AssignVarValue(char *varName1, struct variable var2)
@@ -348,6 +463,9 @@ void Yell(char *varName)
 {
     struct variable var;
     var = GetVariable(varName);
+
+    if (haveError)
+        return;
 
     switch (var.dataType)
     {
