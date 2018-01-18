@@ -80,7 +80,8 @@ extern int yydebug;
     FOR = 290,
     IF = 291,
     ELSE = 292,
-    YELL = 293
+    YELL = 293,
+    PLSPLS = 294
   };
 #endif
 /* Tokens.  */
@@ -120,6 +121,7 @@ extern int yydebug;
 #define IF 291
 #define ELSE 292
 #define YELL 293
+#define PLSPLS 294
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -133,9 +135,9 @@ union YYSTYPE
     bool boolVal;
     char strVal[MAX_STRVAL];
     struct variable var;
-    struct FunctionResult fRez;
+    Parameter parameter;
 
-#line 139 "y.tab.h" /* yacc.c:1909  */
+#line 141 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

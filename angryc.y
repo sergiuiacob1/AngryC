@@ -18,7 +18,7 @@
     bool boolVal;
     char strVal[MAX_STRVAL];
     struct variable var;
-    struct FunctionResult fRez;
+    Parameter parameter;
 };
 
 %token ID ID_VECTOR CONST
@@ -35,11 +35,11 @@
 
 %type<intVal> INTEGER
 %type<var> varop
-%type<fRez> function_call
-%type<intVal> data_type VAR_DATA_TYPE FUNCTION_DATA_TYPE 
-%type<strVal> ID ID_VECTOR STRING param_list_function_call param_function_call
+%type<intVal> data_type VAR_DATA_TYPE FUNCTION_DATA_TYPE function_call
+%type<strVal> ID ID_VECTOR STRING param_list_function_call param_declaration_list
 %type<strVal> assign_op ADD_ASSIGN AND_ASSIGN MUL_ASSIGN DIV_ASSIGN OR_ASSIGN MOD_ASSIGN SUB_ASSIGN
 %type<doubleVal> DOUBLE
+%type<parameter> param_function_call
 //%type<boolVal> varlogop
 
 %left '=' ADD_ASSIGN AND_ASSIGN MUL_ASSIGN DIV_ASSIGN OR_ASSIGN MOD_ASSIGN SUB_ASSIGN
@@ -49,6 +49,7 @@
 %left AND_OP
 %left EQ_OP NE_OP
 %left LS_OP LE_OP GR_OP GE_OP
+%nonassoc PLSPLS
 
 %%
 progr: declarations programInstructions
@@ -63,15 +64,16 @@ data_type: VAR_DATA_TYPE {$$ = $1;}
          ;
 
 declaration: variable_declaration
-           | function_declaration
+           | function_declaration {nrParams = 0;}
            | vector_declaration
            | const_variable_declaration
            ;
 
 variable_declaration: VAR_DATA_TYPE ID {AddNewVariable($1, $2); if (PrgError()) {return -1;}}
 
-function_declaration: data_type ID '(' paramList ')'
-                    | data_type ID '('')'
+function_declaration: data_type ID '(' param_declaration_list ')' {AddNewFunctionWithParameters ($1, $2); if (PrgError()) {return -1;}}
+                    | data_type ID '('')' {AddNewFunction ($1, $2); if (PrgError()) {return -1;}}
+                    ;
 
 vector_declaration: VAR_DATA_TYPE ID_VECTOR '[' INTEGER ']' {DeclareVector ($1, $2, $4); if (PrgError()) {return -1;}}
 
@@ -79,22 +81,22 @@ const_variable_declaration: CONST VAR_DATA_TYPE ID '=' INTEGER {AddNewConstant($
                           | CONST VAR_DATA_TYPE ID '=' DOUBLE {AddNewConstant($2, $3, $5); if (PrgError()) {return -1;}}
                           | CONST VAR_DATA_TYPE ID '=' STRING {AddNewConstant($2, $3, $5); if (PrgError()) {return -1;}}
 
-paramList : data_type
-          | data_type ',' paramList 
-          ;
+param_declaration_list: data_type {parameters[nrParams].dataType = $1; ++nrParams;}
+                       | data_type ',' param_declaration_list {parameters[nrParams].dataType = $1; ++nrParams;}
+                       ;
 
-programInstructions : BGIN instructions END  
-     ;
+programInstructions: BGIN instructions END;
      
-instructions :  statement '!' 
-     | instructions statement '!'
-     ;
+instructions : statement '!' 
+             | instructions statement '!'
+             ;
 
 statement: assignment
          | function_call
          | YELL '(' ID ')' {Yell ($3); if (PrgError()) {return -1;}}
          | YELL '(' STRING ')' {YellString ($3); if (PrgError()) {return -1;}}
          | control_statement
+         | varop
          ;
 
 control_statement: if_statement
@@ -151,22 +153,27 @@ varop: varop '+' varop { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {r
      | varop NE_OP varop { $$ = OperatorFunction ($1, "!=", $3); if (PrgError()) {return -1;}}
      | varop LS_OP varop { $$ = OperatorFunction ($1, "<", $3); if (PrgError()) {return -1;}}
      | varop GR_OP varop { $$ = OperatorFunction ($1, ">", $3); if (PrgError()) {return -1;}}
+     | PLSPLS ID { Incr($2); $$= GetVariable($2); }
+     | ID PLSPLS { $$=GetVariable($1); Incr($1); }
      | ID {$$ = GetVariable($1); }
-     | INTEGER {;struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.intVal = $1; tempVar.dataType = INT_t; tempVar.isInitialized = true; $$ = tempVar;}
+     | INTEGER {struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.intVal = $1; tempVar.dataType = INT_t; tempVar.isInitialized = true; $$ = tempVar;}
      | DOUBLE {struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.doubleVal = $1; tempVar.dataType = DOUBLE_t; tempVar.isInitialized = true;  $$ = tempVar;}
      | STRING {struct variable tempVar; tempVar.value.stringVal = (char*)malloc (strlen($1)+1); strcpy (tempVar.varName, "tempVar"); strcpy (tempVar.value.stringVal, $1); tempVar.dataType = STRING_t; tempVar.isInitialized = true;  $$ = tempVar;}
      ;
 
-function_call: ID '(' param_list_function_call ')' {$$ = FunctionCallWithParameters ($1, $3);}
-             | ID '('')' {}
+function_call: ID '(' param_list_function_call ')' {FunctionCallWithParameters ($1); nrParams = 0; if (PrgError()) {return -1;} $$ = GetFunction($1).dataType;}
+             | ID '('')' {} {FunctionCallNoParameters ($1); if (PrgError()) {return -1;} $$ = VOID_t;}
              ;
 
-param_list_function_call: param_function_call {strcpy ($$, $1);}
-                        | param_function_call ',' param_list_function_call {strcpy ($$, $1); strcat ($$, " "); strcat ($$, $3);}
+param_list_function_call: param_function_call {parameters[nrParams] = $1; ++nrParams;}
+                        | param_function_call ',' param_list_function_call {parameters[nrParams] = $1; ++nrParams; }
                         ;
 
-param_function_call: ID {strcpy ($$, $1); }
-                   | INTEGER {CopyNumberToString ($$, $1);}
+param_function_call: ID {struct variable var; var = GetVariable ($1); if (PrgError()) {return -1;} strcpy ($$.parName, $1); $$.dataType = GetVariable ($1).dataType; $$.isFunction = false;}
+                   | INTEGER {$$.dataType = INT_t; $$.isFunction = false;}
+                   | DOUBLE {$$.dataType = DOUBLE_t; $$.isFunction = false;}
+                   | STRING {$$.dataType = STRING_t; $$.isFunction = false;}
+                   | function_call {$$.dataType = $1; $$.isFunction = true;}
 
 %%
 bool PrgError(){

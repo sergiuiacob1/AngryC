@@ -8,6 +8,7 @@
 #define MAX_VAR_NAME 256
 #define MAX_ERROR 1000
 #define MAX_STRVAL 10000
+#define MAX_PARAMETERS 100
 
 #define BOOL_t -1
 #define CHAR_t -2
@@ -37,10 +38,18 @@ struct variable
   struct data value;
 };
 
-struct FunctionResult
+struct Parameter
 {
-  struct variable rezVar;
-  bool isVoid;
+  char parName[MAX_VAR_NAME];
+  int dataType;
+  bool isFunction;
+};
+
+struct Function
+{
+  int dataType, idFunction;
+  char functionName[MAX_VAR_NAME];
+  int parameters[MAX_PARAMETERS], nrParams;
 };
 
 struct Vector
@@ -53,6 +62,8 @@ struct Vector
 
 extern bool haveError;
 extern char errorMessage[MAX_ERROR];
+extern struct Parameter parameters[MAX_PARAMETERS];
+extern int nrParams;
 
 void init();
 int SetDataType(const char *);
@@ -72,8 +83,13 @@ struct variable GeFunction(struct variable a, struct variable b);
 struct variable EqFunction(struct variable a, struct variable b);
 struct variable NeqFunction(struct variable a, struct variable b);
 
+void Incr(char *);
+
 void AddNewVariable(int, char *);
 struct variable GetVariable(char *);
+
+void AddNewFunctionWithParameters(int, char *);
+void AddNewFunction(int, char *);
 
 void CheckAssign(char *, int);
 void AssignValue(char *, int);
@@ -86,7 +102,8 @@ void YellString(char *);
 
 void CopyNumberToString(char *, int);
 void FunctionCallNoParameters(char *);
-struct FunctionResult FunctionCallWithParameters(char *, char *);
+void FunctionCallWithParameters(char *);
+struct Function GetFunction(char *);
 
 void DeclareVector(int, char *, int);
 void ExtractVectorName(char *, char *);

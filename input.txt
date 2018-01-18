@@ -4,15 +4,17 @@ int x[5]!
 bool mahbool!
 string mystr!
 void Functie (int, int)!
+int f()!
 const int aInt=221!
 const double aDouble=1.5!
 const string aString="a"!
 
 START_ALREADY!
+f2()!
+Functie (5, f2())!
 
-aString = "salz"!
 c=2!
-a=2+5*45-c!
+a=2+aInt!
 mystr = "salzzz" + "a"!
 yell(a)!
 yell("\n")!
@@ -25,6 +27,7 @@ for (a=2! a<5! a+=2)
     }!
 
 a=a*-a!
+++a!
 yell (a)!
 yell("\n")! 
 mahbool = 1!

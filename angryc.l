@@ -28,6 +28,7 @@ varId [_]*{letter}+{number}*
 "!="		 {return(NE_OP); }
 "<"			 {return(LS_OP); }
 ">"			 {return(GR_OP); }
+"++"		 {return(PLSPLS);}
 "="			 {return('='); }
 "!"			 {return('!'); }
 "-"			 {return('-'); }

@@ -1,23 +1,52 @@
 #include "./utils.h"
 
-int nrVars, nrVectors, nextVarId;
+int nrVars, nrVectors, nrFunctions, nextVarId, nextFunctionId;
 struct variable vars[MAX_VARS];
 struct Vector vectors[MAX_VARS];
+struct Function functions[MAX_VARS];
 bool varDeclared[MAX_VARS];
 
 bool haveError;
 char errorMessage[MAX_ERROR];
+struct Parameter parameters[MAX_PARAMETERS];
+int nrParams;
 
 void MallocMemoryForVector(struct Vector *);
 bool AlreadyHaveVariableOrVectorName(char *);
 
 void init()
 {
-    nrVars = nrVectors = 0;
-    nextVarId = 0;
+    nrVars = nrVectors = nrFunctions = 0;
+    nextVarId = nextFunctionId = 0;
     haveError = false;
     errorMessage[0] = 0;
     bzero(varDeclared, sizeof(varDeclared));
+}
+
+void AddNewFunction(int dataType, char *fName)
+{
+    if (AlreadyHaveVariableOrVectorName(fName))
+        return;
+
+    strcpy(functions[nrFunctions].functionName, fName);
+    functions[nrFunctions].dataType = dataType;
+    functions[nrFunctions].idFunction = nextFunctionId++;
+    functions[nrFunctions].nrParams = 0;
+    ++nrFunctions;
+}
+
+void AddNewFunctionWithParameters(int dataType, char *fName)
+{
+    if (AlreadyHaveVariableOrVectorName(fName))
+        return;
+
+    strcpy(functions[nrFunctions].functionName, fName);
+    functions[nrFunctions].dataType = dataType;
+    functions[nrFunctions].idFunction = nextFunctionId++;
+    functions[nrFunctions].nrParams = nrParams;
+    for (int i = 0; i < nrParams; ++i)
+        functions[nrFunctions].parameters[i] = parameters[i].dataType;
+    ++nrFunctions;
 }
 
 bool WordIsReserved(char *word)
@@ -56,6 +85,18 @@ bool AlreadyHaveVariableOrVectorName(char *name)
             int nrVars, nrVectors, nextVarId;
 
             strcpy(errorMessage, "Ugh... YOU ALREADY USED THAT NAME");
+            return true;
+        }
+    }
+
+    for (i = 0; i < nrFunctions; ++i)
+    {
+        if (strcmp(functions[i].functionName, name) == 0)
+        {
+            haveError = true;
+            int nrVars, nrVectors, nextVarId;
+
+            strcpy(errorMessage, "Wrong function name... YOU ALREADY USED THAT NAME");
             return true;
         }
     }
@@ -179,13 +220,35 @@ void CopyNumberToString(char *s, int nr)
 
 void FunctionCallNoParameters(char *fId)
 {
+    Function f;
+    f = GetFunction(fId);
+    if (haveError)
+        return;
 }
 
-struct FunctionResult FunctionCallWithParameters(char *fId, char *params)
+void FunctionCallWithParameters(char *fId)
 {
-    struct FunctionResult rez;
+    Function f;
+    f = GetFunction(fId);
+    if (haveError)
+        return;
+    //verific parametrii
 
-    return rez;
+    if (nrParams != f.nrParams){
+        haveError = true;
+        strcpy (errorMessage, "wrong number of parameters");
+        return;
+    }
+
+    for (int i = 0; i < f.nrParams; ++i)
+    {
+        if (f.parameters[i] != parameters[i].dataType)
+        {
+            haveError = true;
+            strcpy(errorMessage, "parameters have different types! who taught you how to code?!");
+            return;
+        }
+    }
 }
 
 int SetDataType(const char *text)
@@ -891,6 +954,20 @@ struct variable GetVariable(char *varName)
     return vars[0];
 }
 
+struct Function GetFunction(char *fName)
+{
+    for (int i = 0; i < nrFunctions; ++i)
+    {
+        if (strcmp(functions[i].functionName, fName) == 0)
+            return functions[i];
+    }
+
+    //eroare
+    haveError = true;
+    strcpy(errorMessage, "DOES IT LOOK LIKE THIS FUNCTION EXISTS?!");
+    return functions[0];
+}
+
 void CheckAssign(char varName[], int val)
 {
 }
@@ -1098,4 +1175,29 @@ void YellString(char *text)
     }
     else
         printf("%s", text);
+}
+
+void Incr(char *varName1)
+{
+    int i = -1;
+    for (i = 0; i < nrVars; ++i)
+        if (strcmp(varName1, vars[i].varName) == 0)
+            break;
+
+    if (i == nrVars)
+    {
+        haveError = true;
+        strcpy(errorMessage, "YOU DON'T HAVE THAT VARIABLE!!!!");
+        return;
+    }
+
+    switch (vars[i].dataType)
+    {
+    case INT_t:
+        vars[i].value.intVal += 1;
+        break;
+    case DOUBLE_t:
+        vars[i].value.doubleVal += 1;
+        break;
+    }
 }
