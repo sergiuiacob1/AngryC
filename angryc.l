@@ -9,22 +9,17 @@ letter [a-zA-Z_]
 varId [_]*{letter}+{number}*
 
 %%
-"int"|"double"|"char"|"string" {yylval.intVal = SetDataType (yytext); return VAR_DATA_TYPE;}
+"int"|"double"|"char"|"string"|"bool" {yylval.intVal = SetDataType (yytext); return VAR_DATA_TYPE;}
 "void" {yylval.intVal = SetDataType (yytext); return FUNCTION_DATA_TYPE;}
 "START_ALREADY!" {return BGIN;}
 "ARE_WE_DONE_YET?!" {return END;}
-">>="		 {return(RIGHT_ASSIGN); }
-"<<="		 {return(LEFT_ASSIGN); }
 "+="		 {strcpy (yylval.strVal, yytext); return(ADD_ASSIGN); }
 "-="		 {strcpy (yylval.strVal, yytext); return(SUB_ASSIGN); }
 "*="		 {strcpy (yylval.strVal, yytext); return(MUL_ASSIGN); }
 "/="		 {strcpy (yylval.strVal, yytext); return(DIV_ASSIGN); }
 "%="		 {strcpy (yylval.strVal, yytext); return(MOD_ASSIGN); }
 "&="		 {strcpy (yylval.strVal, yytext); return(AND_ASSIGN); }
-"^="		 {strcpy (yylval.strVal, yytext); return(XOR_ASSIGN); }
 "|="		 {strcpy (yylval.strVal, yytext); return(OR_ASSIGN); }
-">>"		 {return(RIGHT_OP); }
-"<<"		 {return(LEFT_OP); }
 "&&"		 {return(AND_OP); }
 "||"		 {return(OR_OP); }
 "<="		 {return(LE_OP); }

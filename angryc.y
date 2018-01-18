@@ -114,7 +114,7 @@ varop: varop '+' varop { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {r
      | varop '/' varop { $$ = OperatorFunction ($1,"/", $3); if (PrgError()) {return -1;}}
      | varop '%' varop { $$ = OperatorFunction ($1, "%", $3); if (PrgError()) {return -1;}}
      | '(' varop ')' {$$ = $2;}
-     | varop AND_OP varop { $$ = OperatorFunction ($1, "&&", $3); if (PrgError()) {return -1;}}
+     | varop AND_OP varop {$$ = OperatorFunction ($1, "&&", $3); if (PrgError()) {return -1;}}
      | varop OR_OP varop { $$ = OperatorFunction ($1, "||", $3); if (PrgError()) {return -1;}}
      | varop LE_OP varop { $$ = OperatorFunction ($1, "<=", $3); if (PrgError()) {return -1;}}
      | varop GE_OP varop { $$ = OperatorFunction ($1, ">=", $3); if (PrgError()) {return -1;}}
@@ -123,8 +123,8 @@ varop: varop '+' varop { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {r
      | varop LS_OP varop { $$ = OperatorFunction ($1, "<", $3); if (PrgError()) {return -1;}}
      | varop GR_OP varop { $$ = OperatorFunction ($1, ">", $3); if (PrgError()) {return -1;}}
      | ID {$$ = GetVariable($1); }
-     | INTEGER {;struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.intVal = $1; tempVar.dataType = INT_t; $$ = tempVar;}
-     | DOUBLE {struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.doubleVal = $1; tempVar.dataType = DOUBLE_t; $$ = tempVar;}
+     | INTEGER {;struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.intVal = $1; tempVar.dataType = INT_t; tempVar.isInitialized = true; $$ = tempVar;}
+     | DOUBLE {struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.doubleVal = $1; tempVar.dataType = DOUBLE_t; tempVar.isInitialized = true;  $$ = tempVar;}
      ;
 
 function_call: ID '(' param_list_function_call ')' {$$ = FunctionCallWithParameters ($1, $3);}

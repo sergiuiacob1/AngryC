@@ -1518,7 +1518,7 @@ yyreduce:
 
   case 42:
 #line 117 "angryc.y" /* yacc.c:1646  */
-    { (yyval.var) = OperatorFunction ((yyvsp[-2].var), "&&", (yyvsp[0].var)); if (PrgError()) {return -1;}}
+    {(yyval.var) = OperatorFunction ((yyvsp[-2].var), "&&", (yyvsp[0].var)); if (PrgError()) {return -1;}}
 #line 1523 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1572,13 +1572,13 @@ yyreduce:
 
   case 51:
 #line 126 "angryc.y" /* yacc.c:1646  */
-    {;struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.intVal = (yyvsp[0].intVal); tempVar.dataType = INT_t; (yyval.var) = tempVar;}
+    {;struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.intVal = (yyvsp[0].intVal); tempVar.dataType = INT_t; tempVar.isInitialized = true; (yyval.var) = tempVar;}
 #line 1577 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
 #line 127 "angryc.y" /* yacc.c:1646  */
-    {struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.doubleVal = (yyvsp[0].doubleVal); tempVar.dataType = DOUBLE_t; (yyval.var) = tempVar;}
+    {struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.doubleVal = (yyvsp[0].doubleVal); tempVar.dataType = DOUBLE_t; tempVar.isInitialized = true;  (yyval.var) = tempVar;}
 #line 1583 "y.tab.c" /* yacc.c:1646  */
     break;
 

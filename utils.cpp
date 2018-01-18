@@ -67,6 +67,7 @@ void AddNewConstant(int dataType, char *varName, int value)
     strcpy(vars[nrVars].varName, varName);
     vars[nrVars].idVar = ++nextVarId;
     vars[nrVars].isConstant = true;
+    vars[nrVars].isInitialized = true;
     ++nrVars;
     AssignValue(varName, value);
     if (haveError)
@@ -134,7 +135,6 @@ void DeclareVector(int vectorType, char *vName, int vSize)
     vectors[nrVectors].dataType = vectorType;
     vectors[nrVectors].size = vSize;
     vectors[nrVectors].idVector = nextVarId++;
-
     MallocMemoryForVector(&vectors[nrVectors]);
     ++nrVectors;
 }
@@ -192,6 +192,8 @@ int SetDataType(const char *text)
         return STRING_t;
     if (strcmp(text, "void") == 0)
         return VOID_t;
+    if (strcmp(text, "bool") == 0)
+        return BOOL_t;
 
     return INVALID_t;
 }
@@ -199,6 +201,7 @@ int SetDataType(const char *text)
 struct variable OperatorFunction(struct variable var1, const char *op, struct variable var2)
 {
     struct variable rez;
+    rez.isInitialized = false;
     strcpy(rez.varName, "tempRez");
     //struct variable var1, var2;
     //var1 = GetVariable(a);
@@ -208,6 +211,13 @@ struct variable OperatorFunction(struct variable var1, const char *op, struct va
     {
         haveError = true;
         strcpy(errorMessage, "variables have different data types, you blittering idiot!");
+        return rez;
+    }
+
+    if (var1.isInitialized == false || var2.isInitialized == false)
+    {
+        haveError = true;
+        strcpy(errorMessage, "you have used an UNINITIALIZED VARIABLE");
         return rez;
     }
 
@@ -240,6 +250,7 @@ struct variable OperatorFunction(struct variable var1, const char *op, struct va
     if (strcmp(op, ">") == 0)
         rez = GrFunction(var1, var2);
     strcpy(rez.varName, "tempRez");
+    rez.isInitialized = true;
     return rez;
 }
 
@@ -460,56 +471,33 @@ struct variable AndFunction(struct variable a, struct variable b)
 struct variable OrFunction(struct variable a, struct variable b)
 {
     struct variable res;
+    res.dataType = BOOL_t;
     if (a.dataType == INT_t && b.dataType == INT_t)
-    {
         res.value.boolVal = a.value.intVal || b.value.intVal;
-        res.dataType = BOOL_t;
-    }
 
     if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
-    {
         res.value.boolVal = a.value.doubleVal || b.value.doubleVal;
-        res.dataType = BOOL_t;
-    }
 
     if (a.dataType == DOUBLE_t && b.dataType == INT_t)
-    {
         res.value.boolVal = a.value.doubleVal || b.value.intVal;
-        res.dataType = BOOL_t;
-    }
 
     if (a.dataType == INT_t && b.dataType == DOUBLE_t)
         res = OrFunction(b, a);
 
     if (a.dataType == BOOL_t && b.dataType == BOOL_t)
-    {
         res.value.boolVal = a.value.boolVal || b.value.boolVal;
-        res.dataType = BOOL_t;
-    }
 
     if (a.dataType == BOOL_t && b.dataType == INT_t)
-    {
         res.value.boolVal = a.value.boolVal || b.value.intVal;
-        res.dataType = BOOL_t;
-    }
 
     if (a.dataType == INT_t && b.dataType == BOOL_t)
-    {
         res.value.boolVal = a.value.intVal || b.value.boolVal;
-        res.dataType = BOOL_t;
-    }
 
     if (a.dataType == BOOL_t && b.dataType == DOUBLE_t)
-    {
         res.value.boolVal = a.value.boolVal || b.value.doubleVal;
-        res.dataType = BOOL_t;
-    }
 
     if (a.dataType == DOUBLE_t && b.dataType == BOOL_t)
-    {
         res.value.boolVal = a.value.doubleVal || b.value.boolVal;
-        res.dataType = BOOL_t;
-    }
     return res;
 }
 
@@ -877,6 +865,7 @@ void AddNewVariable(int type, char *varName)
     strcpy(vars[nrVars].varName, varName);
     vars[nrVars].idVar = nextVarId++;
     vars[nrVars].isConstant = false;
+    vars[nrVars].isInitialized = false;
     ++nrVars;
 }
 
@@ -905,6 +894,19 @@ void AssignValue(char *varName, int val)
     for (i = 0; i < nrVars; ++i)
         if (strcmp(varName, vars[i].varName) == 0)
         {
+            if (vars[i].dataType == BOOL_t)
+                if ((val != 0 && val != 1))
+                {
+                    haveError = true;
+                    strcpy(errorMessage, "wrong value for bool");
+                    return;
+                }
+                else
+                {
+                    vars[i].value.boolVal = val;
+                    vars[i].isInitialized = true;
+                }
+
             if (vars[i].dataType == VOID_t || vars[i].dataType == STRING_t)
             {
                 haveError = true;
@@ -915,9 +917,11 @@ void AssignValue(char *varName, int val)
             {
             case DOUBLE_t:
                 vars[i].value.doubleVal = val;
+                vars[i].isInitialized = true;
                 break;
             case INT_t:
                 vars[i].value.intVal = val;
+                vars[i].isInitialized = true;
                 break;
             }
             return;
@@ -939,6 +943,7 @@ void AssignValue(char *varName, double val)
                 return;
             }
             vars[i].value.doubleVal = val;
+            vars[i].isInitialized = true;
             return;
         }
 
@@ -968,6 +973,7 @@ void AssignValue(char *varName, char *strVal)
                     return;
                 }
                 vars[i].value.charVal = strVal[0];
+                vars[i].isInitialized = true;
                 break;
 
             case STRING_t:
@@ -976,6 +982,7 @@ void AssignValue(char *varName, char *strVal)
 
                 vars[i].value.stringVal = new char[strlen(strVal) + 1];
                 strcpy(vars[i].value.stringVal, strVal);
+                vars[i].isInitialized = true;
                 break;
             }
             return;
@@ -1012,6 +1019,9 @@ void AssignVarValue(char *varName1, struct variable var2)
         break;
     case STRING_t:
         AssignValue(varName1, var2.value.stringVal);
+        break;
+    case BOOL_t:
+        AssignValue(varName1, (int)var2.value.boolVal);
         break;
     }
 }
