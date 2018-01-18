@@ -1,14 +1,34 @@
 int a!
 int c!
 int x[5]!
+bool mahbool!
+string mystr!
 void Functie (int, int)!
 const int aInt=221!
 const double aDouble=1.5!
-const char aString="a"!
+const string aString="a"!
 
 START_ALREADY!
+
+aString = "salz"!
 c=2!
 a=2+5*45-c!
+mystr = "salzzz" + "a"!
 yell(a)!
+yell("\n")!
+yell(mystr)!
+yell("\n")!
+if (1) {a=5!}!
+for (a=2! a<5! a+=2)
+    {
+        a=2!
+    }!
+
+a=a*-a!
+yell (a)!
+yell("\n")! 
+mahbool = 1!
+mahbool=~mahbool!
+yell(mahbool)!
 yell("\n")!
 ARE_WE_DONE_YET?!

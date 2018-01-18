@@ -79,7 +79,8 @@ extern int yydebug;
     TYPE_NAME = 289,
     FOR = 290,
     IF = 291,
-    YELL = 292
+    ELSE = 292,
+    YELL = 293
   };
 #endif
 /* Tokens.  */
@@ -117,7 +118,8 @@ extern int yydebug;
 #define TYPE_NAME 289
 #define FOR 290
 #define IF 291
-#define YELL 292
+#define ELSE 292
+#define YELL 293
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -133,7 +135,7 @@ union YYSTYPE
     struct variable var;
     struct FunctionResult fRez;
 
-#line 137 "y.tab.h" /* yacc.c:1909  */
+#line 139 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

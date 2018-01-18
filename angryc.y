@@ -29,7 +29,7 @@
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token XOR_ASSIGN OR_ASSIGN TYPE_NAME 
-%token FOR IF
+%token FOR IF ELSE
 %token YELL
 %start progr
 
@@ -94,7 +94,34 @@ statement: assignment
          | function_call
          | YELL '(' ID ')' {Yell ($3); if (PrgError()) {return -1;}}
          | YELL '(' STRING ')' {YellString ($3); if (PrgError()) {return -1;}}
+         | control_statement
          ;
+
+control_statement: if_statement
+                 | for_statement
+                 ;
+
+for_statement: FOR '(' for_assignments '!' varop '!' varop ')'
+             | FOR '(' for_assignments '!' varop '!' for_assignments ')' 
+             | FOR '(' for_assignments '!' varop '!' ')'
+             | FOR '(' '!' varop '!' varop ')'
+             | FOR '(' '!' varop '!' for_assignments ')'
+             | FOR '(' '!' varop '!' ')' {/*PANA AICI FARA INSTRUCZTIUNI*/}
+             | FOR '(' for_assignments '!' varop '!' varop ')' '{' instructions '}'
+             | FOR '(' for_assignments '!' varop '!' for_assignments ')' '{' instructions '}'
+             | FOR '(' for_assignments '!' varop '!' ')' '{' instructions '}'
+             | FOR '(' '!' varop '!' varop ')' '{' instructions '}'
+             | FOR '(' '!' varop '!' for_assignments ')' '{' instructions '}'
+             | FOR '(' '!' varop '!' ')' '{' instructions '}'
+
+for_assignments: assignment
+               | assignment ',' for_assignments
+
+if_statement: IF varop '{' instructions '}' {}
+            | IF varop '{' '}'
+            | IF varop '{' instructions '}' ELSE '{' instructions '}'
+            | IF varop '{' '}' ELSE '{' instructions '}'
+            | IF varop '{' '}' ELSE '{' '}'
 
 assignment: ID '=' varop {AssignVarValue ($1, $3); if (PrgError()) {return -1;}}
           | ID assign_op varop {struct variable var1, rezVar; var1 = GetVariable($1); rezVar = $3; rezVar = OperatorFunction (var1, $2, rezVar); AssignVarValue (var1.varName, rezVar);}
@@ -114,8 +141,10 @@ varop: varop '+' varop { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {r
      | varop '/' varop { $$ = OperatorFunction ($1,"/", $3); if (PrgError()) {return -1;}}
      | varop '%' varop { $$ = OperatorFunction ($1, "%", $3); if (PrgError()) {return -1;}}
      | '(' varop ')' {$$ = $2;}
+     | '-' varop %prec '*'  { $$ = $2; $$.value.intVal=-$$.value.intVal; $$.value.doubleVal=-$$.value.doubleVal;}
+     | '~' varop %prec "LS_OP" { $$ = $2; if($$.value.boolVal==0){$$.value.boolVal=1;}else{$$.value.boolVal=0;} }
      | varop AND_OP varop {$$ = OperatorFunction ($1, "&&", $3); if (PrgError()) {return -1;}}
-     | varop OR_OP varop { $$ = OperatorFunction ($1, "||", $3); if (PrgError()) {return -1;}}
+     | varop OR_OP varop {$$ = OperatorFunction ($1, "||", $3); if (PrgError()) {return -1;}}
      | varop LE_OP varop { $$ = OperatorFunction ($1, "<=", $3); if (PrgError()) {return -1;}}
      | varop GE_OP varop { $$ = OperatorFunction ($1, ">=", $3); if (PrgError()) {return -1;}}
      | varop EQ_OP varop { $$ = OperatorFunction ($1, "==", $3); if (PrgError()) {return -1;}}
@@ -125,6 +154,7 @@ varop: varop '+' varop { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {r
      | ID {$$ = GetVariable($1); }
      | INTEGER {;struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.intVal = $1; tempVar.dataType = INT_t; tempVar.isInitialized = true; $$ = tempVar;}
      | DOUBLE {struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.doubleVal = $1; tempVar.dataType = DOUBLE_t; tempVar.isInitialized = true;  $$ = tempVar;}
+     | STRING {struct variable tempVar; tempVar.value.stringVal = (char*)malloc (strlen($1)+1); strcpy (tempVar.varName, "tempVar"); strcpy (tempVar.value.stringVal, $1); tempVar.dataType = STRING_t; tempVar.isInitialized = true;  $$ = tempVar;}
      ;
 
 function_call: ID '(' param_list_function_call ')' {$$ = FunctionCallWithParameters ($1, $3);}
@@ -137,9 +167,6 @@ param_list_function_call: param_function_call {strcpy ($$, $1);}
 
 param_function_call: ID {strcpy ($$, $1); }
                    | INTEGER {CopyNumberToString ($$, $1);}
-       
-//varlogop: ID LW ID {  $$ = LogicOperatorFunction ($1, "<", $3) if (PrgError()) {return -1;}}
-//		;
 
 %%
 bool PrgError(){

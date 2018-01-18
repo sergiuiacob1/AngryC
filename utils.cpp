@@ -26,6 +26,12 @@ bool WordIsReserved(char *word)
         return true;
     if (strcmp(word, "const") == 0)
         return true;
+    if (strcmp(word, "if") == 0)
+        return true;
+    if (strcmp(word, "for") == 0)
+        return true;
+    if (strcmp(word, "else") == 0)
+        return true;
     return false;
 }
 
@@ -66,12 +72,12 @@ void AddNewConstant(int dataType, char *varName, int value)
     vars[nrVars].dataType = dataType;
     strcpy(vars[nrVars].varName, varName);
     vars[nrVars].idVar = ++nextVarId;
-    vars[nrVars].isConstant = true;
     vars[nrVars].isInitialized = true;
     ++nrVars;
     AssignValue(varName, value);
     if (haveError)
         --nrVars;
+    vars[nrVars - 1].isConstant = true;
     return;
 }
 
@@ -84,11 +90,12 @@ void AddNewConstant(int dataType, char *varName, double value)
     vars[nrVars].dataType = dataType;
     strcpy(vars[nrVars].varName, varName);
     vars[nrVars].idVar = ++nextVarId;
-    vars[nrVars].isConstant = true;
+    vars[nrVars].isInitialized = true;
     ++nrVars;
     AssignValue(varName, value);
     if (haveError)
         --nrVars;
+    vars[nrVars - 1].isConstant = true;
     return;
 }
 
@@ -101,11 +108,12 @@ void AddNewConstant(int dataType, char *varName, char *strVal)
     vars[nrVars].dataType = dataType;
     strcpy(vars[nrVars].varName, varName);
     vars[nrVars].idVar = ++nextVarId;
-    vars[nrVars].isConstant = true;
+    vars[nrVars].isInitialized = true;
     ++nrVars;
     AssignValue(varName, strVal);
     if (haveError)
         --nrVars;
+    vars[nrVars - 1].isConstant = true;
     return;
 }
 
@@ -894,6 +902,13 @@ void AssignValue(char *varName, int val)
     for (i = 0; i < nrVars; ++i)
         if (strcmp(varName, vars[i].varName) == 0)
         {
+            if (vars[i].isConstant)
+            {
+                haveError = true;
+                strcpy(errorMessage, "can't reinitialize a constant variable LIKE OH MY GOSH!");
+                return;
+            }
+
             if (vars[i].dataType == BOOL_t)
                 if ((val != 0 && val != 1))
                 {
@@ -936,6 +951,13 @@ void AssignValue(char *varName, double val)
     for (i = 0; i < nrVars; ++i)
         if (strcmp(varName, vars[i].varName) == 0)
         {
+            if (vars[i].isConstant)
+            {
+                haveError = true;
+                strcpy(errorMessage, "can't reinitialize a constant variable LIKE OH MY GOSH!");
+                return;
+            }
+
             if (vars[i].dataType != DOUBLE_t)
             {
                 haveError = true;
@@ -956,6 +978,13 @@ void AssignValue(char *varName, char *strVal)
     for (i = 0; i < nrVars; ++i)
         if (strcmp(varName, vars[i].varName) == 0)
         {
+            if (vars[i].isConstant)
+            {
+                haveError = true;
+                strcpy(errorMessage, "can't reinitialize a constant variable LIKE OH MY GOSH!");
+                return;
+            }
+
             if (vars[i].dataType != CHAR_t && vars[i].dataType != STRING_t)
             {
                 haveError = true;
@@ -1033,6 +1062,13 @@ void Yell(char *varName)
 
     if (haveError)
         return;
+
+    if (var.isInitialized == false)
+    {
+        haveError = true;
+        strcpy(errorMessage, "variable uninitialized");
+        return;
+    }
 
     switch (var.dataType)
     {

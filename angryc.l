@@ -37,6 +37,7 @@ varId [_]*{letter}+{number}*
 "%"			 {return('%'); }
 "for" {return FOR;}
 "if" {return IF;}
+"else" {return ELSE;}
 {varId} {if (WordIsReserved (yytext)) {REJECT;} strcpy (yylval.strVal, yytext); return ID;}
 {varId}[ \t]*\[ {ExtractVectorName(yylval.strVal, yytext); if (WordIsReserved(yylval.strVal)) {REJECT;} yyless (yyleng - 1); return ID_VECTOR; }
 {number} {yylval.intVal = atoi(yytext); return INTEGER;}
