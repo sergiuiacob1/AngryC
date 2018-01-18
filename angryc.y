@@ -21,7 +21,7 @@
     Parameter parameter;
 };
 
-%token ID ID_VECTOR CONST
+%token ID ID_VECTOR CONST STRUCT
 %token BGIN END
 %token VAR_DATA_TYPE FUNCTION_DATA_TYPE
 %token INTEGER DOUBLE STRING
@@ -68,7 +68,11 @@ declaration: variable_declaration
            | function_declaration '{' '}' {nrParams = 0;}
            | vector_declaration
            | const_variable_declaration
+           | struct_declaration
            ;
+
+struct_declaration: STRUCT ID '{' declarations '}' {AddNewStruct ($2); if (PrgError()) {return -1;}}
+                  ;
 
 function_instructions: instructions
                      | declarations
@@ -104,6 +108,7 @@ statement: assignment
          | function_call
          | YELL '(' ID ')' {Yell ($3); if (PrgError()) {return -1;}}
          | YELL '(' STRING ')' {YellString ($3); if (PrgError()) {return -1;}}
+         | YELL '(' ID_VECTOR '[' INTEGER ']' ')' {YellVec($3, $5); if (PrgError()) {return -1;}}
          | control_statement
          | varop
          ;
@@ -132,10 +137,13 @@ if_statement: IF varop '{' instructions '}' {}
             | IF varop '{' '}'
             | IF varop '{' instructions '}' ELSE '{' instructions '}'
             | IF varop '{' '}' ELSE '{' instructions '}'
+            | IF varop '{' instructions '}' ELSE '{' '}'
             | IF varop '{' '}' ELSE '{' '}'
 
 assignment: ID '=' varop {AssignVarValue ($1, $3); if (PrgError()) {return -1;}}
           | ID assign_op varop {struct variable var1, rezVar; var1 = GetVariable($1); rezVar = $3; rezVar = OperatorFunction (var1, $2, rezVar); AssignVarValue (var1.varName, rezVar);}
+          | ID_VECTOR '[' INTEGER ']' '=' varop { AssignVectorValue($1, $3, $6); if (PrgError()) {return -1;} }
+          ;
 
 assign_op: ADD_ASSIGN {strcpy ($$, $1);}
          | SUB_ASSIGN {strcpy ($$, $1);}

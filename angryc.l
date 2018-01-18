@@ -6,9 +6,10 @@
 
 number 0|[1-9][0-9]*
 letter [a-zA-Z_]
-varId [_]*{letter}+{number}*
+varId [_]*{letter}+{number}*{letter}*
 
 %%
+"struct" {return STRUCT;}
 "int"|"double"|"char"|"string"|"bool" {yylval.intVal = SetDataType (yytext); return VAR_DATA_TYPE;}
 "void" {yylval.intVal = SetDataType (yytext); return FUNCTION_DATA_TYPE;}
 "START_ALREADY!" {return BGIN;}

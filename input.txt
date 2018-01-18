@@ -1,6 +1,6 @@
 int a!
 int c!
-int x[5]!
+double x[5]!
 bool mahbool!
 string mystr!
 void Functie (int, int) {}!
@@ -9,6 +9,15 @@ int f3 (void, string, int) {}!
 const int aInt=221!
 const double aDouble=1.5!
 const string aString="a"!
+
+struct unstruct2{
+    int camp1!
+    bool camp2!
+}!
+
+struct unstruct2222{
+     string campAux!
+}!
 
 START_ALREADY!
 f2()!
@@ -22,7 +31,7 @@ yell(a)!
 yell("\n")!
 yell(mystr)!
 yell("\n")!
-if (1) {a=5!}!
+if (1) {a=5!} else {a=4!}!
 for (a=2! a<5! a+=2)
     {
         a=2!
@@ -35,5 +44,9 @@ yell("\n")!
 mahbool = 1!
 mahbool=~mahbool!
 yell(mahbool)!
+yell("\n")!
+
+x[0]=5.5!
+yell(x[0])!
 yell("\n")!
 ARE_WE_DONE_YET?!

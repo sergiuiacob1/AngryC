@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 #define MAX_VARS 1000
 #define MAX_VAR_NAME 256
 #define MAX_ERROR 1000
@@ -61,6 +62,13 @@ struct Vector
   struct data *values;
 };
 
+struct Struct
+{
+  char structName[MAX_VAR_NAME];
+  int idStruct;
+  struct variable vars[MAX_VARS];
+};
+
 extern bool haveError;
 extern char errorMessage[MAX_ERROR];
 extern struct Parameter parameters[MAX_PARAMETERS];
@@ -97,7 +105,12 @@ void AssignValue(char *, int);
 void AssignValue(char *, double);
 void AssignValue(char *, char *);
 void AssignVarValue(char *, struct variable);
+void AssignVectorValue(char *vecName, int pos, struct variable);
+void AssignVecValue(char *vecName, int pos, char *strVal);
+void AssignVecValue(char *vecName, int pos, double val);
+void AssignVecValue(char *vecName, int pos, int val);
 
+void YellVec(char *, int);
 void Yell(char *);
 void YellString(char *);
 
@@ -112,6 +125,8 @@ void ExtractVectorName(char *, char *);
 void AddNewConstant(int, char *, int);
 void AddNewConstant(int, char *, double);
 void AddNewConstant(int, char *, char *);
+
+void AddNewStruct(char *);
 
 bool WordIsReserved(char *);
 #endif

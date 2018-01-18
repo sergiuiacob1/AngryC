@@ -48,80 +48,82 @@ extern int yydebug;
     ID = 258,
     ID_VECTOR = 259,
     CONST = 260,
-    BGIN = 261,
-    END = 262,
-    VAR_DATA_TYPE = 263,
-    FUNCTION_DATA_TYPE = 264,
-    INTEGER = 265,
-    DOUBLE = 266,
-    STRING = 267,
-    LEFT_OP = 268,
-    RIGHT_OP = 269,
-    LE_OP = 270,
-    GE_OP = 271,
-    EQ_OP = 272,
-    NE_OP = 273,
-    LS_OP = 274,
-    GR_OP = 275,
-    DONE = 276,
-    AND_OP = 277,
-    OR_OP = 278,
-    MUL_ASSIGN = 279,
-    DIV_ASSIGN = 280,
-    MOD_ASSIGN = 281,
-    ADD_ASSIGN = 282,
-    SUB_ASSIGN = 283,
-    LEFT_ASSIGN = 284,
-    RIGHT_ASSIGN = 285,
-    AND_ASSIGN = 286,
-    XOR_ASSIGN = 287,
-    OR_ASSIGN = 288,
-    TYPE_NAME = 289,
-    FOR = 290,
-    IF = 291,
-    ELSE = 292,
-    YELL = 293,
-    PLSPLS = 294
+    STRUCT = 261,
+    BGIN = 262,
+    END = 263,
+    VAR_DATA_TYPE = 264,
+    FUNCTION_DATA_TYPE = 265,
+    INTEGER = 266,
+    DOUBLE = 267,
+    STRING = 268,
+    LEFT_OP = 269,
+    RIGHT_OP = 270,
+    LE_OP = 271,
+    GE_OP = 272,
+    EQ_OP = 273,
+    NE_OP = 274,
+    LS_OP = 275,
+    GR_OP = 276,
+    DONE = 277,
+    AND_OP = 278,
+    OR_OP = 279,
+    MUL_ASSIGN = 280,
+    DIV_ASSIGN = 281,
+    MOD_ASSIGN = 282,
+    ADD_ASSIGN = 283,
+    SUB_ASSIGN = 284,
+    LEFT_ASSIGN = 285,
+    RIGHT_ASSIGN = 286,
+    AND_ASSIGN = 287,
+    XOR_ASSIGN = 288,
+    OR_ASSIGN = 289,
+    TYPE_NAME = 290,
+    FOR = 291,
+    IF = 292,
+    ELSE = 293,
+    YELL = 294,
+    PLSPLS = 295
   };
 #endif
 /* Tokens.  */
 #define ID 258
 #define ID_VECTOR 259
 #define CONST 260
-#define BGIN 261
-#define END 262
-#define VAR_DATA_TYPE 263
-#define FUNCTION_DATA_TYPE 264
-#define INTEGER 265
-#define DOUBLE 266
-#define STRING 267
-#define LEFT_OP 268
-#define RIGHT_OP 269
-#define LE_OP 270
-#define GE_OP 271
-#define EQ_OP 272
-#define NE_OP 273
-#define LS_OP 274
-#define GR_OP 275
-#define DONE 276
-#define AND_OP 277
-#define OR_OP 278
-#define MUL_ASSIGN 279
-#define DIV_ASSIGN 280
-#define MOD_ASSIGN 281
-#define ADD_ASSIGN 282
-#define SUB_ASSIGN 283
-#define LEFT_ASSIGN 284
-#define RIGHT_ASSIGN 285
-#define AND_ASSIGN 286
-#define XOR_ASSIGN 287
-#define OR_ASSIGN 288
-#define TYPE_NAME 289
-#define FOR 290
-#define IF 291
-#define ELSE 292
-#define YELL 293
-#define PLSPLS 294
+#define STRUCT 261
+#define BGIN 262
+#define END 263
+#define VAR_DATA_TYPE 264
+#define FUNCTION_DATA_TYPE 265
+#define INTEGER 266
+#define DOUBLE 267
+#define STRING 268
+#define LEFT_OP 269
+#define RIGHT_OP 270
+#define LE_OP 271
+#define GE_OP 272
+#define EQ_OP 273
+#define NE_OP 274
+#define LS_OP 275
+#define GR_OP 276
+#define DONE 277
+#define AND_OP 278
+#define OR_OP 279
+#define MUL_ASSIGN 280
+#define DIV_ASSIGN 281
+#define MOD_ASSIGN 282
+#define ADD_ASSIGN 283
+#define SUB_ASSIGN 284
+#define LEFT_ASSIGN 285
+#define RIGHT_ASSIGN 286
+#define AND_ASSIGN 287
+#define XOR_ASSIGN 288
+#define OR_ASSIGN 289
+#define TYPE_NAME 290
+#define FOR 291
+#define IF 292
+#define ELSE 293
+#define YELL 294
+#define PLSPLS 295
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -137,7 +139,7 @@ union YYSTYPE
     struct variable var;
     Parameter parameter;
 
-#line 141 "y.tab.h" /* yacc.c:1909  */
+#line 143 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

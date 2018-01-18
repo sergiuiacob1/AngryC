@@ -1,9 +1,10 @@
 #include "./utils.h"
 
-int nrVars, nrVectors, nrFunctions, nextVarId, nextFunctionId;
+int nrVars, nrVectors, nrFunctions, nrStructs, nextVarId, nextFunctionId, nextStructId;
 struct variable vars[MAX_VARS];
 struct Vector vectors[MAX_VARS];
 struct Function functions[MAX_VARS];
+struct Struct structs[MAX_VARS];
 bool varDeclared[MAX_VARS];
 
 bool haveError;
@@ -63,6 +64,8 @@ bool WordIsReserved(char *word)
         return true;
     if (strcmp(word, "else") == 0)
         return true;
+    if (strcmp(word, "struct") == 0)
+        return true;
     return false;
 }
 
@@ -84,8 +87,6 @@ bool AlreadyHaveVariableOrVectorName(char *name)
         if (strcmp(vars[i].varName, name) == 0)
         {
             haveError = true;
-            int nrVars, nrVectors, nextVarId;
-
             strcpy(errorMessage, "Ugh... YOU ALREADY USED THAT NAME");
             return true;
         }
@@ -96,14 +97,32 @@ bool AlreadyHaveVariableOrVectorName(char *name)
         if (strcmp(functions[i].functionName, name) == 0)
         {
             haveError = true;
-            int nrVars, nrVectors, nextVarId;
+            strcpy(errorMessage, "Wrong name... YOU ALREADY USED THAT NAME");
+            return true;
+        }
+    }
 
-            strcpy(errorMessage, "Wrong function name... YOU ALREADY USED THAT NAME");
+    for (i = 0; i < nrStructs; ++i)
+    {
+        if (strcmp(structs[i].structName, name) == 0)
+        {
+            haveError = true;
+            strcpy(errorMessage, "Wrong name... YOU ALREADY USED THAT NAME");
             return true;
         }
     }
 
     return false;
+}
+
+void AddNewStruct(char *structName)
+{
+    if (AlreadyHaveVariableOrVectorName(structName))
+        return;
+
+    strcpy(structs[nrStructs].structName, structName);
+    structs[nrStructs].idStruct = nextStructId++;
+    ++nrStructs;
 }
 
 void AddNewConstant(int dataType, char *varName, int value)
@@ -227,9 +246,10 @@ void FunctionCallNoParameters(char *fId)
     if (haveError)
         return;
 
-    if (f.nrParams != 0){
+    if (f.nrParams != 0)
+    {
         haveError = true;
-        strcpy (errorMessage, "function needs to receive parameters... GET OUT");
+        strcpy(errorMessage, "function needs to receive parameters... GET OUT");
         return;
     }
 }
@@ -242,9 +262,10 @@ void FunctionCallWithParameters(char *fId)
         return;
     //verific parametrii
 
-    if (nrParams != f.nrParams){
+    if (nrParams != f.nrParams)
+    {
         haveError = true;
-        strcpy (errorMessage, "wrong number of parameters");
+        strcpy(errorMessage, "wrong number of parameters");
         return;
     }
 
@@ -1140,6 +1161,40 @@ void AssignVarValue(char *varName1, struct variable var2)
     }
 }
 
+void YellVec(char *vecName, int pos)
+{
+    int i;
+    for (i = 0; i < nrVectors; ++i)
+        if (strcmp(vecName, vectors[i].vectorName) == 0)
+            break;
+
+    if (i == nrVectors)
+    {
+        haveError = true;
+        strcpy(errorMessage, "YOU DON'T HAVE THAT VECTOR!!!!");
+        return;
+    }
+
+    switch (vectors[i].dataType)
+    {
+    case INT_t:
+        printf("%d", vectors[i].values[pos].intVal);
+        break;
+    case DOUBLE_t:
+        printf("%lf", vectors[i].values[pos].doubleVal);
+        break;
+    case CHAR_t:
+        printf("%c", vectors[i].values[pos].charVal);
+        break;
+    case STRING_t:
+        printf("%s", vectors[i].values[pos].stringVal);
+        break;
+    case BOOL_t:
+        printf("%s", vectors[i].values[pos].boolVal ? "true" : "false");
+        break;
+    }
+}
+
 void Yell(char *varName)
 {
     struct variable var;
@@ -1208,4 +1263,144 @@ void Incr(char *varName1)
         vars[i].value.doubleVal += 1;
         break;
     }
+}
+
+void AssignVectorValue(char *vecName, int pos, struct variable var)
+{
+    int i;
+    for (i = 0; i < nrVectors; ++i)
+        if (strcmp(vecName, vectors[i].vectorName) == 0)
+            break;
+
+    if (i == nrVectors)
+    {
+        haveError = true;
+        strcpy(errorMessage, "YOU DON'T HAVE THAT VECTOR!!!!");
+        return;
+    }
+
+    switch (var.dataType)
+    {
+    case INT_t:
+        AssignVecValue(vecName, pos, var.value.intVal);
+        break;
+    case DOUBLE_t:
+        AssignVecValue(vecName, pos, var.value.doubleVal);
+        break;
+    case CHAR_t:
+        char strTemp[2];
+        strTemp[0] = var.value.charVal;
+        strTemp[1] = 0;
+        AssignVecValue(vecName, pos, strTemp);
+        break;
+    case STRING_t:
+        AssignVecValue(vecName, pos, var.value.stringVal);
+        break;
+    case BOOL_t:
+        AssignVecValue(vecName, pos, (int)var.value.boolVal);
+        break;
+    }
+}
+
+void AssignVecValue(char *vecName, int pos, int val)
+{
+    int i;
+
+    for (i = 0; i < nrVectors; ++i)
+        if (strcmp(vecName, vectors[i].vectorName) == 0)
+        {
+            if (vectors[i].dataType == BOOL_t)
+                if ((val != 0 && val != 1))
+                {
+                    haveError = true;
+                    strcpy(errorMessage, "wrong value for bool");
+                    return;
+                }
+                else
+                {
+                    vectors[i].values[pos].boolVal = val;
+                    //vectors[i].isInitialized = true;
+                }
+
+            if (vectors[i].dataType == VOID_t || vectors[i].dataType == STRING_t)
+            {
+                haveError = true;
+                strcpy(errorMessage, "dude, wrong assignment... ugh... does yo momma want you?");
+                return;
+            }
+            switch (vectors[i].dataType)
+            {
+            case DOUBLE_t:
+                vectors[i].values[pos].doubleVal = val;
+                //vars[i].isInitialized = true;
+                break;
+            case INT_t:
+                vectors[i].values[pos].intVal = val;
+                //vars[i].isInitialized = true;
+                break;
+            }
+            return;
+        }
+
+    return;
+}
+
+void AssignVecValue(char *vecName, int pos, double val)
+{
+    int i;
+    for (i = 0; i < nrVectors; ++i)
+        if (strcmp(vecName, vectors[i].vectorName) == 0)
+        {
+            if (vectors[i].dataType != DOUBLE_t)
+            {
+                haveError = true;
+                strcpy(errorMessage, "dude, wrong assignment... ugh... does yo momma want you?");
+                return;
+            }
+            vectors[i].values[pos].doubleVal = val;
+            //vars[i].isInitialized = true;
+            return;
+        }
+
+    return;
+}
+
+void AssignVecValue(char *vecName, int pos, char *strVal)
+{
+    int i;
+    for (i = 0; i < nrVectors; ++i)
+        if (strcmp(vecName, vectors[i].vectorName) == 0)
+        {
+
+            if (vectors[i].dataType != CHAR_t && vectors[i].dataType != STRING_t)
+            {
+                haveError = true;
+                strcpy(errorMessage, "dude, wrong assignment... ugh...");
+                return;
+            }
+
+            switch (vectors[i].dataType)
+            {
+            case CHAR_t:
+                if (strlen(strVal) > 1)
+                {
+                    haveError = true;
+                    strcpy(errorMessage, "can't assign string to char!");
+                    return;
+                }
+                vectors[i].values[pos].charVal = strVal[0];
+                //vars[i].isInitialized = true;
+                break;
+
+            case STRING_t:
+                if (vectors[i].values[pos].stringVal != NULL)
+                    delete vectors[i].values[pos].stringVal;
+
+                vectors[i].values[pos].stringVal = new char[strlen(strVal) + 1];
+                strcpy(vectors[i].values[pos].stringVal, strVal);
+                //vars[i].isInitialized = true;
+                break;
+            }
+            return;
+        }
 }
