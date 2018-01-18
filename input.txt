@@ -1,17 +1,15 @@
-double a!
+int a!
+double b!
+double c!
 int x[5]!
-int b!
-int c!
 void Functie (int, int)!
 const int aInt=221!
 const double aDouble=1.5!
 const char aString="a"!
 
 START_ALREADY!
-yell(aDouble)!
-yell("\n")!
-yell(aInt)!
-yell("\n")!
-yell(aString)!
+a=3! b=7!
+a=b*5/2!
+yell(a)!
 yell("\n")!
 ARE_WE_DONE_YET?!

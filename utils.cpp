@@ -196,25 +196,23 @@ int SetDataType(const char *text)
     return INVALID_t;
 }
 
-struct variable OperatorFunction(char *a, const char *op, char *b)
+struct variable OperatorFunction(struct variable var1, const char *op, struct variable var2)
 {
-    struct variable rez, var1, var2;
+    struct variable rez;
+    strcpy(rez.varName, "tempRez");
+    //struct variable var1, var2;
+    //var1 = GetVariable(a);
+    //var2 = GetVariable(b);
 
-    var1 = GetVariable(a);
-    var2 = GetVariable(b);
-
-    if (haveError)
-    {
-        return rez;
-    }
-
-    /*if (HaveDifferentTypes(var1, var2))
+    if (HaveDifferentTypes(var1, var2))
     {
         haveError = true;
         strcpy(errorMessage, "variables have different data types, you blittering idiot!");
         return rez;
-    }*/
+    }
 
+    if (strcmp(op, "+=") == 0)
+        rez = SumFunction(var1, var2);
     if (strcmp(op, "+") == 0)
         rez = SumFunction(var1, var2);
     if (strcmp(op, "-") == 0)
@@ -222,7 +220,26 @@ struct variable OperatorFunction(char *a, const char *op, char *b)
     if (strcmp(op, "*") == 0)
         rez = TimesFunction(var1, var2);
     if (strcmp(op, "/") == 0)
-        rez = SumFunction(var1, var2);
+        rez = FractionFunction(var1, var2);
+    if (strcmp(op, "%") == 0)
+        rez = ModFunction(var1, var2);
+    if (strcmp(op, "&&") == 0)
+        rez = AndFunction(var1, var2);
+    if (strcmp(op, "||") == 0)
+        rez = OrFunction(var1, var2);
+    if (strcmp(op, "<=") == 0)
+        rez = LeFunction(var1, var2);
+    if (strcmp(op, ">=") == 0)
+        rez = GeFunction(var1, var2);
+    if (strcmp(op, "==") == 0)
+        rez = EqFunction(var1, var2);
+    if (strcmp(op, "!=") == 0)
+        rez = NeqFunction(var1, var2);
+    if (strcmp(op, "<") == 0)
+        rez = LsFunction(var1, var2);
+    if (strcmp(op, ">") == 0)
+        rez = GrFunction(var1, var2);
+    strcpy(rez.varName, "tempRez");
     return rez;
 }
 
@@ -238,13 +255,22 @@ struct variable SumFunction(struct variable a, struct variable b)
 {
     struct variable res;
     if (a.dataType == INT_t && b.dataType == INT_t)
+    {
         res.value.intVal = a.value.intVal + b.value.intVal;
+        res.dataType = INT_t;
+    }
 
     if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
         res.value.doubleVal = a.value.doubleVal + b.value.doubleVal;
+        res.dataType = DOUBLE_t;
+    }
 
     if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
         res.value.doubleVal = a.value.doubleVal + b.value.intVal;
+        res.dataType = DOUBLE_t;
+    }
 
     if (a.dataType == INT_t && b.dataType == DOUBLE_t)
         res = SumFunction(b, a);
@@ -255,14 +281,16 @@ struct variable SumFunction(struct variable a, struct variable b)
         res.value.stringVal[0] = a.value.charVal;
         res.value.stringVal[1] = b.value.charVal;
         res.value.stringVal[2] = 0;
+        res.dataType = STRING_t;
     }
 
-    if (a.dataType == STRING_t && b.dataType == STRING_t)
+    if (a.dataType == STRING_t && b.dataType == CHAR_t)
     {
         res.value.stringVal = (char *)malloc(strlen(a.value.stringVal) + 2);
         strcpy(res.value.stringVal, a.value.stringVal);
         res.value.stringVal[strlen(res.value.stringVal)] = b.value.charVal;
         res.value.stringVal[sizeof(res.value.stringVal) - 1] = 0;
+        res.dataType = STRING_t;
     }
 
     if (a.dataType == CHAR_t && b.dataType == STRING_t)
@@ -273,6 +301,7 @@ struct variable SumFunction(struct variable a, struct variable b)
         res.value.stringVal = (char *)malloc(strlen(a.value.stringVal) + strlen(b.value.stringVal) + 1);
         strcpy(res.value.stringVal, a.value.stringVal);
         strcat(res.value.stringVal, b.value.stringVal);
+        res.dataType = STRING_t;
     }
     return res;
 }
@@ -281,16 +310,28 @@ struct variable MinusFunction(struct variable a, struct variable b)
 {
     struct variable res;
     if (a.dataType == INT_t && b.dataType == INT_t)
+    {
         res.value.intVal = a.value.intVal - b.value.intVal;
+        res.dataType = INT_t;
+    }
 
     if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
         res.value.doubleVal = a.value.doubleVal - b.value.doubleVal;
+        res.dataType = DOUBLE_t;
+    }
 
     if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
         res.value.doubleVal = a.value.doubleVal - b.value.intVal;
+        res.dataType = DOUBLE_t;
+    }
 
     if (a.dataType == INT_t && b.dataType == DOUBLE_t)
-        res = MinusFunction(b, a);
+    {
+        res.value.doubleVal = a.value.intVal - b.value.doubleVal;
+        res.dataType = DOUBLE_t;
+    }
     return res;
 }
 
@@ -298,13 +339,22 @@ struct variable TimesFunction(struct variable a, struct variable b)
 {
     struct variable res;
     if (a.dataType == INT_t && b.dataType == INT_t)
+    {
         res.value.intVal = a.value.intVal * b.value.intVal;
+        res.dataType = INT_t;
+    }
 
     if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
         res.value.doubleVal = a.value.doubleVal * b.value.doubleVal;
+        res.dataType = DOUBLE_t;
+    }
 
     if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
         res.value.doubleVal = a.value.doubleVal * b.value.intVal;
+        res.dataType = DOUBLE_t;
+    }
 
     if (a.dataType == INT_t && b.dataType == DOUBLE_t)
         res = TimesFunction(b, a);
@@ -315,16 +365,505 @@ struct variable FractionFunction(struct variable a, struct variable b)
 {
     struct variable res;
     if (a.dataType == INT_t && b.dataType == INT_t)
+    {
         res.value.intVal = a.value.intVal / b.value.intVal;
+        res.dataType = INT_t;
+    }
 
     if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
         res.value.doubleVal = a.value.doubleVal / b.value.doubleVal;
+        res.dataType = DOUBLE_t;
+    }
 
     if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
         res.value.doubleVal = a.value.doubleVal / b.value.intVal;
+        res.dataType = DOUBLE_t;
+    }
 
     if (a.dataType == INT_t && b.dataType == DOUBLE_t)
-        res = FractionFunction(b, a);
+    {
+        res.value.doubleVal = a.value.intVal / b.value.doubleVal;
+        res.dataType = DOUBLE_t;
+    }
+    return res;
+}
+
+struct variable ModFunction(struct variable a, struct variable b)
+{
+    struct variable res;
+    if (a.dataType == INT_t && b.dataType == INT_t)
+    {
+        res.value.intVal = a.value.intVal % b.value.intVal;
+        res.dataType = INT_t;
+        return res;
+    }
+}
+
+struct variable AndFunction(struct variable a, struct variable b)
+{
+    struct variable res;
+    if (a.dataType == INT_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.intVal && b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.doubleVal && b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.doubleVal && b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == DOUBLE_t)
+        res = AndFunction(b, a);
+
+    if (a.dataType == BOOL_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.boolVal && b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.boolVal && b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.intVal && b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.boolVal && b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.doubleVal && b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+    return res;
+}
+
+struct variable OrFunction(struct variable a, struct variable b)
+{
+    struct variable res;
+    if (a.dataType == INT_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.intVal || b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.doubleVal || b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.doubleVal || b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == DOUBLE_t)
+        res = OrFunction(b, a);
+
+    if (a.dataType == BOOL_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.boolVal || b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.boolVal || b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.intVal || b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.boolVal || b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.doubleVal || b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+    return res;
+}
+
+struct variable LeFunction(struct variable a, struct variable b)
+{
+    struct variable res;
+    if (a.dataType == INT_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.intVal <= b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.doubleVal <= b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.doubleVal <= b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.intVal <= b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.boolVal <= b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.boolVal <= b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.intVal <= b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.boolVal <= b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.doubleVal <= b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+    return res;
+}
+
+struct variable GeFunction(struct variable a, struct variable b)
+{
+    struct variable res;
+    if (a.dataType == INT_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.intVal >= b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.doubleVal >= b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.doubleVal >= b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.intVal >= b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.boolVal >= b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.boolVal >= b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.intVal >= b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.boolVal >= b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.doubleVal >= b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+    return res;
+}
+
+struct variable EqFunction(struct variable a, struct variable b)
+{
+    struct variable res;
+    if (a.dataType == INT_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.intVal == b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.doubleVal == b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.doubleVal == b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.intVal == b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.boolVal == b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.boolVal == b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.intVal == b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.boolVal == b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.doubleVal == b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+    return res;
+}
+
+struct variable NeqFunction(struct variable a, struct variable b)
+{
+    struct variable res;
+    if (a.dataType == INT_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.intVal != b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.doubleVal != b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.doubleVal != b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.intVal != b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.boolVal != b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.boolVal != b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.intVal != b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.boolVal != b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.doubleVal != b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+    return res;
+}
+
+struct variable LsFunction(struct variable a, struct variable b)
+{
+    struct variable res;
+    if (a.dataType == INT_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.intVal < b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.doubleVal < b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.doubleVal < b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.intVal < b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.boolVal < b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.boolVal < b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.intVal < b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.boolVal < b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.doubleVal < b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+    return res;
+}
+
+struct variable GrFunction(struct variable a, struct variable b)
+{
+    struct variable res;
+    if (a.dataType == INT_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.intVal > b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.doubleVal > b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.doubleVal > b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = (a.value.intVal > b.value.doubleVal);
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.boolVal > b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == INT_t)
+    {
+        res.value.boolVal = a.value.boolVal > b.value.intVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == INT_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.intVal > b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == BOOL_t && b.dataType == DOUBLE_t)
+    {
+        res.value.boolVal = a.value.boolVal > b.value.doubleVal;
+        res.dataType = BOOL_t;
+    }
+
+    if (a.dataType == DOUBLE_t && b.dataType == BOOL_t)
+    {
+        res.value.boolVal = a.value.doubleVal > b.value.boolVal;
+        res.dataType = BOOL_t;
+    }
     return res;
 }
 
@@ -450,13 +989,31 @@ void AssignVarValue(char *varName1, struct variable var2)
         if (strcmp(varName1, vars[i].varName) == 0)
             break;
 
-    if (i == -1)
+    if (i == nrVars)
     {
-        //eroare
+        haveError = true;
+        strcpy(errorMessage, "YOU DON'T HAVE THAT VARIABLE!!!!");
         return;
     }
 
-    vars[i].value = var2.value;
+    switch (var2.dataType)
+    {
+    case INT_t:
+        AssignValue(varName1, var2.value.intVal);
+        break;
+    case DOUBLE_t:
+        AssignValue(varName1, var2.value.doubleVal);
+        break;
+    case CHAR_t:
+        char strTemp[2];
+        strTemp[0] = var2.value.charVal;
+        strTemp[1] = 0;
+        AssignValue(varName1, strTemp);
+        break;
+    case STRING_t:
+        AssignValue(varName1, var2.value.stringVal);
+        break;
+    }
 }
 
 void Yell(char *varName)

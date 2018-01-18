@@ -55,18 +55,31 @@ extern int yydebug;
     INTEGER = 265,
     DOUBLE = 266,
     STRING = 267,
-    SUM = 268,
-    FRACTION = 269,
-    MINUS = 270,
-    TIMES = 271,
-    LW = 272,
-    LWE = 273,
-    EQ = 274,
-    GRE = 275,
-    GR = 276,
-    FOR = 277,
-    IF = 278,
-    YELL = 279
+    LEFT_OP = 268,
+    RIGHT_OP = 269,
+    LE_OP = 270,
+    GE_OP = 271,
+    EQ_OP = 272,
+    NE_OP = 273,
+    LS_OP = 274,
+    GR_OP = 275,
+    DONE = 276,
+    AND_OP = 277,
+    OR_OP = 278,
+    MUL_ASSIGN = 279,
+    DIV_ASSIGN = 280,
+    MOD_ASSIGN = 281,
+    ADD_ASSIGN = 282,
+    SUB_ASSIGN = 283,
+    LEFT_ASSIGN = 284,
+    RIGHT_ASSIGN = 285,
+    AND_ASSIGN = 286,
+    XOR_ASSIGN = 287,
+    OR_ASSIGN = 288,
+    TYPE_NAME = 289,
+    FOR = 290,
+    IF = 291,
+    YELL = 292
   };
 #endif
 /* Tokens.  */
@@ -80,18 +93,31 @@ extern int yydebug;
 #define INTEGER 265
 #define DOUBLE 266
 #define STRING 267
-#define SUM 268
-#define FRACTION 269
-#define MINUS 270
-#define TIMES 271
-#define LW 272
-#define LWE 273
-#define EQ 274
-#define GRE 275
-#define GR 276
-#define FOR 277
-#define IF 278
-#define YELL 279
+#define LEFT_OP 268
+#define RIGHT_OP 269
+#define LE_OP 270
+#define GE_OP 271
+#define EQ_OP 272
+#define NE_OP 273
+#define LS_OP 274
+#define GR_OP 275
+#define DONE 276
+#define AND_OP 277
+#define OR_OP 278
+#define MUL_ASSIGN 279
+#define DIV_ASSIGN 280
+#define MOD_ASSIGN 281
+#define ADD_ASSIGN 282
+#define SUB_ASSIGN 283
+#define LEFT_ASSIGN 284
+#define RIGHT_ASSIGN 285
+#define AND_ASSIGN 286
+#define XOR_ASSIGN 287
+#define OR_ASSIGN 288
+#define TYPE_NAME 289
+#define FOR 290
+#define IF 291
+#define YELL 292
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -107,7 +133,7 @@ union YYSTYPE
     struct variable var;
     struct FunctionResult fRez;
 
-#line 111 "y.tab.h" /* yacc.c:1909  */
+#line 137 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

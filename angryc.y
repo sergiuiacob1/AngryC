@@ -4,7 +4,7 @@
     #include "./utils.h"
     
     int yylex();
-    int yyerror(char *);
+    int yyerror(const char *);
     bool PrgError();
     
     extern FILE* yyin;
@@ -25,7 +25,10 @@
 %token BGIN END
 %token VAR_DATA_TYPE FUNCTION_DATA_TYPE
 %token INTEGER DOUBLE STRING
-%token SUM FRACTION MINUS TIMES LW LWE EQ GRE GR
+%token LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP LS_OP GR_OP DONE
+%token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
+%token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
+%token XOR_ASSIGN OR_ASSIGN TYPE_NAME 
 %token FOR IF
 %token YELL
 %start progr
@@ -35,10 +38,17 @@
 %type<fRez> function_call
 %type<intVal> data_type VAR_DATA_TYPE FUNCTION_DATA_TYPE 
 %type<strVal> ID ID_VECTOR STRING param_list_function_call param_function_call
+%type<strVal> assign_op ADD_ASSIGN AND_ASSIGN MUL_ASSIGN DIV_ASSIGN OR_ASSIGN MOD_ASSIGN SUB_ASSIGN
 %type<doubleVal> DOUBLE
 //%type<boolVal> varlogop
 
-%left SUM FRACTION MINUS TIMES LW LWE EQ GRE GR
+%left '=' ADD_ASSIGN AND_ASSIGN MUL_ASSIGN DIV_ASSIGN OR_ASSIGN MOD_ASSIGN SUB_ASSIGN
+%left '+' '-'
+%left '*' '/' '%'
+%left OR_OP
+%left AND_OP
+%left EQ_OP NE_OP
+%left LS_OP LE_OP GR_OP GE_OP
 
 %%
 progr: declarations programInstructions
@@ -86,17 +96,35 @@ statement: assignment
          | YELL '(' STRING ')' {YellString ($3); if (PrgError()) {return -1;}}
          ;
 
-assignment: ID '=' ID
-         | ID '=' INTEGER {CheckAssign ($1, $3); if (PrgError ()) {return -1;} AssignValue ($1, $3);}
-         | ID '=' DOUBLE {CheckAssign ($1, $3); if (PrgError()) {return -1;} AssignValue ($1, $3);}
-         | ID '=' varop {AssignVarValue ($1, $3);}
+assignment: ID '=' varop {AssignVarValue ($1, $3); if (PrgError()) {return -1;}}
+          | ID assign_op varop {struct variable var1, rezVar; var1 = GetVariable($1); rezVar = $3; rezVar = OperatorFunction (var1, $2, rezVar); AssignVarValue (var1.varName, rezVar);}
+
+assign_op: ADD_ASSIGN {strcpy ($$, $1);}
+         | SUB_ASSIGN {strcpy ($$, $1);}
+         | MUL_ASSIGN {strcpy ($$, $1);}
+         | DIV_ASSIGN {strcpy ($$, $1);}
+         | MOD_ASSIGN {strcpy ($$, $1);}
+         | AND_ASSIGN {strcpy ($$, $1);}
+         | OR_ASSIGN {strcpy ($$, $1);}
          ;
 
-
-varop: ID SUM ID { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {return -1;}}
-     | ID MINUS ID { $$ = OperatorFunction ($1, "-", $3); if (PrgError()) {return -1;}}
-     | ID TIMES ID { $$ = OperatorFunction ($1, "*", $3); if (PrgError()) {return -1;}}
-     | ID FRACTION ID { $$ = OperatorFunction ($1,"/", $3); if (PrgError()) {return -1;}}
+varop: varop '+' varop { $$ = OperatorFunction ($1, "+", $3); if (PrgError()) {return -1;}}
+     | varop '-' varop { $$ = OperatorFunction ($1, "-", $3); if (PrgError()) {return -1;}}
+     | varop '*' varop { $$ = OperatorFunction ($1, "*", $3); if (PrgError()) {return -1;}}
+     | varop '/' varop { $$ = OperatorFunction ($1,"/", $3); if (PrgError()) {return -1;}}
+     | varop '%' varop { $$ = OperatorFunction ($1, "%", $3); if (PrgError()) {return -1;}}
+     | '(' varop ')' {$$ = $2;}
+     | varop AND_OP varop { $$ = OperatorFunction ($1, "&&", $3); if (PrgError()) {return -1;}}
+     | varop OR_OP varop { $$ = OperatorFunction ($1, "||", $3); if (PrgError()) {return -1;}}
+     | varop LE_OP varop { $$ = OperatorFunction ($1, "<=", $3); if (PrgError()) {return -1;}}
+     | varop GE_OP varop { $$ = OperatorFunction ($1, ">=", $3); if (PrgError()) {return -1;}}
+     | varop EQ_OP varop { $$ = OperatorFunction ($1, "==", $3); if (PrgError()) {return -1;}}
+     | varop NE_OP varop { $$ = OperatorFunction ($1, "!=", $3); if (PrgError()) {return -1;}}
+     | varop LS_OP varop { $$ = OperatorFunction ($1, "<", $3); if (PrgError()) {return -1;}}
+     | varop GR_OP varop { $$ = OperatorFunction ($1, ">", $3); if (PrgError()) {return -1;}}
+     | ID {$$ = GetVariable($1); }
+     | INTEGER {;struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.intVal = $1; tempVar.dataType = INT_t; $$ = tempVar;}
+     | DOUBLE {struct variable tempVar; strcpy (tempVar.varName, "tempVar"); tempVar.value.doubleVal = $1; tempVar.dataType = DOUBLE_t; $$ = tempVar;}
      ;
 
 function_call: ID '(' param_list_function_call ')' {$$ = FunctionCallWithParameters ($1, $3);}
@@ -122,7 +150,7 @@ bool PrgError(){
     return false;
 }
 
-int yyerror(char * s){
+int yyerror(const char *s){
     printf("eroare: %s la linia: %d\n", s, yylineno);
 }
 

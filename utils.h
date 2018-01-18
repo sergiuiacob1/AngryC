@@ -33,7 +33,7 @@ struct variable
 {
   int dataType, idVar;
   char varName[MAX_VAR_NAME];
-  bool isConstant;
+  bool isConstant, isInitialized;
   struct data value;
 };
 
@@ -57,11 +57,20 @@ extern char errorMessage[MAX_ERROR];
 void init();
 int SetDataType(const char *);
 bool HaveDifferentTypes(struct variable, struct variable);
-struct variable OperatorFunction(char *, const char *, char *);
+struct variable OperatorFunction(struct variable, const char *, struct variable);
 struct variable SumFunction(struct variable, struct variable);
 struct variable MinusFunction(struct variable, struct variable);
 struct variable TimesFunction(struct variable, struct variable);
 struct variable FractionFunction(struct variable, struct variable);
+struct variable ModFunction(struct variable a, struct variable b);
+struct variable AndFunction(struct variable a, struct variable b);
+struct variable OrFunction(struct variable a, struct variable b);
+struct variable LeFunction(struct variable a, struct variable b);
+struct variable LsFunction(struct variable a, struct variable b);
+struct variable GrFunction(struct variable a, struct variable b);
+struct variable GeFunction(struct variable a, struct variable b);
+struct variable EqFunction(struct variable a, struct variable b);
+struct variable NeqFunction(struct variable a, struct variable b);
 
 void AddNewVariable(int, char *);
 struct variable GetVariable(char *);
