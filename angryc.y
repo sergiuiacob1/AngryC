@@ -109,6 +109,8 @@ statement: assignment
          | YELL '(' ID ')' {Yell ($3); if (PrgError()) {return -1;}}
          | YELL '(' STRING ')' {YellString ($3); if (PrgError()) {return -1;}}
          | YELL '(' ID_VECTOR '[' INTEGER ']' ')' {YellVec($3, $5); if (PrgError()) {return -1;}}
+         | YELL '(' ID_VECTOR '[' ID ']' ')' {struct variable var = GetVariable ($5); if (var.dataType != INT_t || var.isInitialized == false) {yyerror ("Vector index can only be an initialized integer!!!"); return -1;} YellVec ($3, var.value.intVal); }
+         | YELL '(' varop ')' {YellVarOp ($3); if (PrgError()) {return -1;} }
          | control_statement
          | varop
          ;
@@ -147,6 +149,7 @@ if_statement: IF varop '{' instructions '}' {}
 assignment: ID '=' varop {AssignVarValue ($1, $3); if (PrgError()) {return -1;}}
           | ID assign_op varop {struct variable var1, rezVar; var1 = GetVariable($1); rezVar = $3; rezVar = OperatorFunction (var1, $2, rezVar); AssignVarValue (var1.varName, rezVar);}
           | ID_VECTOR '[' INTEGER ']' '=' varop { AssignVectorValue($1, $3, $6); if (PrgError()) {return -1;} }
+          | ID_VECTOR '[' ID ']' '=' varop {struct variable var = GetVariable ($3); if (PrgError()) {return -1;} if (var.dataType != INT_t || var.isInitialized == false) {yyerror ("Vector index can only be an initialized integer!!!"); return -1;} AssignVectorValue ($1, var.value.intVal, $6);}
           ;
 
 assign_op: ADD_ASSIGN {strcpy ($$, $1);}

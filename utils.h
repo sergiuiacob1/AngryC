@@ -115,6 +115,7 @@ void AssignVecValue(char *vecName, int pos, int val);
 void YellVec(char *, int);
 void Yell(char *);
 void YellString(char *);
+void YellVarOp (struct variable);
 
 void CopyNumberToString(char *, int);
 void FunctionCallNoParameters(char *);

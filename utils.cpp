@@ -1256,6 +1256,28 @@ void YellVec(char *vecName, int pos)
     }
 }
 
+void YellVarOp(struct variable var)
+{
+    switch (var.dataType)
+    {
+    case INT_t:
+        printf("%d", var.value.intVal);
+        break;
+    case DOUBLE_t:
+        printf("%lf", var.value.doubleVal);
+        break;
+    case CHAR_t:
+        printf("%c", var.value.charVal);
+        break;
+    case STRING_t:
+        printf("%s", var.value.stringVal);
+        break;
+    case BOOL_t:
+        printf("%s", var.value.boolVal ? "true" : "false");
+        break;
+    }
+}
+
 void Yell(char *varName)
 {
     struct variable var;
